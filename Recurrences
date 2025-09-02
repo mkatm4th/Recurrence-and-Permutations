@@ -1,0 +1,1364 @@
+from manim import *
+
+class Recurrence(Scene):
+    def construct(self):
+        title = Text("Recurrence Relations", font_size=41, color=BLUE)
+        self.play(Write(title))
+        self.wait()
+
+        # Move title up
+        self.play(title.animate.to_edge(UP))
+
+        # Definition
+        definition = Text("A recurrence relation defines each term using previous terms",
+                          font_size=28).next_to(title, DOWN, buff=1)
+        self.play(Write(definition))
+        self.wait()
+
+        # Natural numbers example
+        example_title = MathTex(r"\mathbb{N} = \{1\,,2\,,3\,,4\,,5\,,6\,,7\,,...\}", font_size=35, color=YELLOW)
+        example_title.next_to(definition, DOWN, buff=1)
+        self.play(Write(example_title))
+
+        # Show the sequence
+        sequence = MathTex(
+            r"a_n \sim C a_{n-1} + D",
+            font_size=36
+        ).next_to(example_title, RIGHT, buff=-1.1)
+
+        recurrence = MathTex(
+            r"\left\{ \begin{aligned}"
+            r"&a_n = a_{n-1} + 1 \\"
+            r"&a_0 = 1"
+            r"\end{aligned} \right.",
+            font_size=36
+        ).next_to(ORIGIN, DOWN, buff=2)
+
+        # Show first few terms
+        terms_group = VGroup()
+        terms = ["1", "2", "3", "4", "5", "..."]
+        for i, term in enumerate(terms):
+            if term == "...":
+                term_obj = Text(term, font_size=24, color=YELLOW)
+            else:
+                term_obj = Text(term, font_size=24, color=YELLOW)
+            term_obj.move_to(LEFT * 3 + RIGHT * i * 1.2 + DOWN * 2)
+            terms_group.add(term_obj)
+
+        labels_group = VGroup()
+        for i in range(5):
+            label = MathTex(f"a_{i}", font_size=25)
+            label.next_to(terms_group[i], DOWN, buff=0.3)
+            labels_group.add(label)
+
+        tgroup = VGroup(terms_group, labels_group)
+        tgroup.next_to(example_title, DOWN, buff=0.8).shift(RIGHT + LEFT * 1.2)
+
+        self.play(AnimationGroup(*[Write(term) for term in terms_group], lag_ratio=0.3))
+        self.play(AnimationGroup(*[Write(label) for label in labels_group], lag_ratio=0.3))
+        self.wait(2)
+
+        self.play(example_title.animate.shift(LEFT * 1.5))
+        self.wait(1)
+        self.play(Write(sequence))
+        self.wait(3)
+
+        self.play(Write(recurrence))
+        self.wait(2)
+
+
+class ParenthesesProblem(Scene):
+    def construct(self):
+        title = Tex(
+            r"Let $A_n$ be the number of sequences with $n$ pairs of open and closed parenthesis. \\",
+            r"For a given $n$, how many {valid sequences} of parentheses are there?",
+            font_size=29,
+            color=BLUE,
+            tex_to_color_map={"valid sequences": YELLOW}
+        )
+
+        self.play(Write(title[0]), run_time = 1.5)
+        self.wait()
+        tgroup = VGroup(title[1], title[2], title[3])
+        self.play(Write(tgroup), run_time = 2)
+        self.wait(2)
+        self.clear()
+
+        title2 = Tex(
+            r"A {valid parentheses sequence} is one where \\"
+            r"we never close a parenthesis before opening one.",
+            font_size=29,
+            color=BLUE,
+            tex_to_color_map={"valid parentheses sequence": YELLOW}
+        )
+
+        self.play(Write(title2))
+        self.wait(2)
+        self.play(title2.animate.shift(UP * 1.5))
+
+        exp1 = MathTex(r"\Rightarrow n=3 \quad \quad \quad \quad \quad \\",r"K = \{ \;",r"()(())",r" \; \} \quad L = \{ \; ",r")(())(",r"\; \}",
+            font_size=35,).next_to(title2, DOWN, buff=1)
+        exp3 = MathTex(r"X = \{ \;",r"((()))",r" \; \} \quad Y = \{ \; ",r"())()(",r"\; \}",
+                       font_size=35,).next_to(exp1, DOWN, buff=0.3)
+        exp1[0].shift(UP * 0.5)
+        exp1[2].set_color(YELLOW)
+        exp1[4].set_color(RED)
+        exp3[1].set_color(YELLOW)
+        exp3[3].set_color(RED)
+        exp2 = MathTex(r"\begin{gathered}"
+                       r"a_n \subset A_n \\"
+                       r"(K,X) \in a_n \quad (L,Y) \notin a_n"
+                       r"\end{gathered}",
+                       font_size= 30).next_to(exp3, DOWN, buff=0.5)
+
+        self.wait(1)
+        self.play(Write(exp1[0]))
+        self.wait(1)
+        self.play(Write(exp1[1]), Write(exp1[2]),Write(exp1[3]), Write(exp1[4]), Write(exp1[5]))
+        self.play(Write(exp3))
+        self.wait(1)
+        self.play(Write(exp2))
+        self.wait(1)
+        self.clear()
+
+        self.play(FadeIn(title))
+        self.wait(2)
+        self.play(title.animate.to_edge(UP).shift(DOWN * 0.5))
+        self.wait(1)
+
+        # Problem statement
+        problem = MathTex(
+            r"\begin{gathered}"
+            r"\Rightarrow \quad \text{Count the sequences of n pairs of parenthesis where} \\"
+            r"\text{no closing parenthesis appears before its opening pair }(a_n)"
+            r"\end{gathered}",
+            font_size=28)
+        problem.next_to(title, DOWN, buff=0.8)
+        self.play(Write(problem))
+        self.wait()
+
+        # Small cases
+        cases_title = MathTex(r"\text{Looking at } a_n", font_size=32, color=YELLOW)
+        cases_title.next_to(problem, DOWN, buff=0.8)
+        self.play(Write(cases_title))
+
+        # n=1 case
+        case1 = VGroup(
+            MathTex(r"\text{1 Pair}", font_size=26, color=GREEN),
+            Text("()", font_size=24),
+            Text("→ a₁ = 1", font_size=24, color = ORANGE),
+        ).arrange(RIGHT, buff=0.3)
+        case1.next_to(cases_title, DOWN, buff=0.5).shift(LEFT * 2.5)
+
+        # n=2 case
+        case2 = VGroup(
+            MathTex(r"\text{2 Pairs}", font_size=26, color=GREEN),
+            Text("()(), (())", font_size=24),
+            Text("→ a₂ = 2", font_size=24, color = ORANGE)
+        ).arrange(RIGHT, buff=0.3)
+        case2.next_to(case1, DOWN, buff=0.6)
+
+        # n=3 case
+        case3_label = MathTex(r"\text{3 Pairs}", font_size=26, color=GREEN)
+        case3_seqs = Text("()()(),   ()(()),\n(())(),   (()()),\n         ((())).", font_size=20, line_spacing=1.2)
+        case3_result = Text("→ a₃ = 5", font_size=24, color = ORANGE)
+
+        case3 = VGroup(case3_label, case3_seqs, case3_result).arrange(RIGHT, buff=0.3)
+        case3.next_to(case2, RIGHT, buff=0.8).shift(UP * 0.53)
+        case3_seqs.shift(DOWN * 0.1)
+
+        self.play(FadeIn(case1))
+        self.wait()
+        self.play(FadeIn(case2))
+        self.wait()
+        self.play(FadeIn(case3))
+        self.wait(3)
+        self.clear()
+        self.wait(1)
+
+        # All sequences for n = 5
+        sequences = [
+            "()()()()()", "()()()(()))", "()()(())()", "()(()()())", "()(()(()))",
+            "()((())())", "()(((())))", "(())()()()", "(())()(()))", "(())(()())",
+            "(())((()))", "(()())()()", "(()())(())", "(()()(()))", "(()(()()))",
+            "(()((())))", "((()))()()", "((()))(())", "((())(()))", "((()()()))",
+            "((()(())))", "(((()))())", "(((())))", "(()()()())", "(()()(()))",
+            "(()(()()))", "(()((())))", "((())()())", "((())(()))", "((()())())",
+            "((()(())))", "(((())()))", "(((()())))", "((()()()))", "((()(())))",
+            "(((())()))", "(((()())))", "(((()))())", "(((())()))", "((((())())))",
+            "(((((())))))"
+        ]
+
+        # Gradient colors from blue to yellow
+        gradient_colors = color_gradient([GREEN, BLUE], len(sequences))
+
+        # Arrange sequences in rows
+        rows = VGroup()
+        row_length = 6  # sequences per row
+        for i in range(0, len(sequences), row_length):
+            row_seqs = sequences[i:i + row_length]
+            row_mobs = VGroup()
+            for j, seq in enumerate(row_seqs):
+                seq_mob = MathTex(f"{{{seq}}}", font_size=20)
+                seq_mob.set_color(gradient_colors[i + j])
+                row_mobs.add(seq_mob)
+            row_mobs.arrange(RIGHT, buff=0.3)
+            if rows:
+                row_mobs.next_to(rows[-1], DOWN, buff=0.3)
+            else:
+                row_mobs.next_to(title, DOWN, buff=0.5)
+            rows.add(row_mobs)
+
+        rows.scale(1.8).shift(UP * 0.3)
+        self.play(Write(rows),run_time=3)
+        self.wait(1)
+
+        # Count
+        count = MathTex(r"\rightarrow a_5 = 42", font_size=30, color=ORANGE)
+        count.next_to(rows, DOWN, buff=0.5)
+        self.play(Write(count))
+        self.wait(2)
+        self.clear()
+        self.wait(1)
+
+        # Build recurrence
+        recur_title = Text("Building the Recurrence", font_size=32, color=YELLOW)
+        recur_title.next_to(title, DOWN, buff=-0.8)
+        self.play(Write(recur_title))
+
+        # n=1 case
+        case1r = VGroup(
+            MathTex(r"\text{1 Pair}", font_size=30, color=GREEN),
+            Text("()", font_size=30),
+
+        ).arrange(RIGHT, buff=0.5)
+        case1r.next_to(recur_title, DOWN, buff=0.5).shift( DOWN * 0.3)
+
+        # n=2 case
+        case2r = VGroup(
+            MathTex(r"\text{2 Pairs}", font_size=30, color=GREEN),
+            Text("()(), (())", font_size=30),
+
+        ).arrange(RIGHT, buff=0.5)
+        case2r.align_to(case1r, LEFT).next_to(case1r, DOWN, buff=0.8)
+
+        # n=3 case
+        case3r_label = MathTex(r"\text{3 Pairs}", font_size=30, color=GREEN)
+        case3r_seqs = Text("()()(),   ()(()),\n(())(),   (()()),\n       ((())).", font_size=30, line_spacing=1.2)
+
+
+        case3r = VGroup(case3r_label, case3r_seqs).arrange(RIGHT, buff=0.5)
+        case3r.align_to(case2r, LEFT).next_to(case2r, DOWN, buff=0.8)
+        case3r_seqs.shift(DOWN * 0.1)
+
+        self.wait(1)
+        self.play(FadeIn(case3r),FadeIn(case2r),FadeIn(case1r))
+        self.wait()
+        mgroup = VGroup(case1r, case2r, case3r, recur_title)
+        self.play(mgroup.animate.shift(LEFT * 4))
+
+        explanation = MathTex(
+            r"\begin{gathered}"
+            r"\text{Consider the first opening parenthesis} \\ "
+            r"\text{and its matching closing parenthesis.} \\ \\"
+            r"\text{Inside: } k \text{ pairs } \; (0 \leq k \leq n-1), \\ "
+            r"\text{Outside (right): } n-1-k \text{ pairs}"
+            r"\end{gathered}",
+            font_size=30
+        )
+
+        explanation.next_to(recur_title, RIGHT).shift(RIGHT * 1.7 + DOWN * 0.9)
+        self.play(Write(explanation))
+        self.wait(1)
+
+        kay = MathTex(r"\Rightarrow \;k = 0",r"a_0a_{n-1}",
+                      font_size=35, color= YELLOW).next_to(explanation, DOWN * 1.5).shift(LEFT * 0.5)
+        kay[1].next_to(kay[0], DOWN, buff=0.4)
+        self.play(Write(kay))
+        self.wait(0.5)
+
+        kay1 = MathTex(r"\Rightarrow \;k = 1", r"a_1a_{n-2}",
+                       font_size=35, color = YELLOW).next_to(kay[0], RIGHT, buff=0.7)
+        kay1[1].next_to(kay1[0], DOWN, buff=0.4)
+        self.play(Write(kay1))
+
+        self.wait(2)
+
+        case1r0 = VGroup(
+            MathTex(r"\text{1 Pair}", font_size=30, color=GREEN),
+            Text("( ∅ )", font_size=30),
+
+        ).arrange(RIGHT, buff=0.5)
+        case1r0.align_to(case1r, LEFT + DOWN)
+        self.play(Transform(case1r, case1r0))
+        fx1 = MathTex(r": \; a_0 a_0 ", font_size=32, color=GREEN).next_to(case1r0, RIGHT)
+        self.play(Write(fx1))
+
+        ene = MathTex(r"n = 3", font_size=25, color=ORANGE).next_to(case3r_label, DOWN, buff=0.3)
+        enek = MathTex( r"\Rightarrow k = \{0\;,1\;,2\}", font_size=25, color=ORANGE).align_to(ene,LEFT).next_to(ene, DOWN, buff=0.3)
+        self.wait()
+        self.play(Write(ene))
+        self.wait(0.5)
+        self.play(Write(enek))
+        self.wait(2)
+
+        nstring = MathTex(r"a_3 \;=\; \underbrace{a_0a_2}_{k = 0} \;+\; "
+                          r"\underbrace{a_1a_1}_{k = 1} \;+\; "
+                          r"\underbrace{a_2a_0}_{k = 2}",
+                          font_size=38, color=BLUE).next_to(case3r_seqs, RIGHT, buff=0.6).shift(RIGHT * 2.2 + DOWN * 0.3)
+        self.play(Write(nstring))
+
+        nstring2 = MathTex(r"a_3 = 1\times2 + 1\times1 + 2\times1 ", font_size=35, color=BLUE).next_to(nstring, DOWN, buff=0.6)
+        nstring3 = MathTex(r"a_3 = 5", font_size=35, color= BLUE).next_to(nstring2,RIGHT).align_to(nstring2, LEFT)
+        self.play(Write(nstring2))
+        self.wait(1)
+        self.play(Transform(nstring2, nstring3))
+        self.wait(2)
+        self.clear()
+        self.wait(1)
+
+        # The recurrence formula
+        formulaseq = MathTex(r"a_n = a_0a_{n-1} \;+ a_1a_{n-2} \;+ a_2a_{n-3} "
+                             r"+ a_{3}a_{n-4} \;+ \dots \;+ a_{n-2}a_1 \;+ a_{n-1}a_0", font_size=36)
+        formulaseq.next_to(ORIGIN, UP, buff=0.4)
+        self.play(Write(formulaseq))
+        self.wait(1)
+
+        formula = MathTex(r"\left\{ \begin{aligned}"
+                          r"&a_n = \sum_{k=0}^{n-1} a_k \cdot a_{n-1-k} \\"
+                          r"&a_0 = 1"
+                          r"\end{aligned} \right.", font_size=36)
+        formula.next_to(ORIGIN, DOWN, buff=-0.4)
+        self.play(Transform(formulaseq, formula))
+        self.wait(2)
+
+
+class FibonacciTreeProblem(Scene):
+    def construct(self):
+        fproblem = MathTex(
+            r"\begin{gathered}"
+            r"\text{A certain species of tree growth was noticed to be such that each of its branches, after two months,} \\"
+            r"\text{would raise a new one, which from then on would go to produce another branch every month.} \\"
+            r"\text{The tree as a sapling} \text{ contains only a single branch, which must wait two months before producing its first offspring.}"
+            r"\end{gathered}",
+            font_size=26,
+            color=BLUE
+        )
+        fquestion = MathTex(
+            r"\begin{gathered}"
+            r"\text{How many branches will this tree have after } n \text{ months?}"
+            r"\end{gathered}",
+            font_size=30,
+            color=BLUE
+        ).next_to(fproblem, DOWN, buff=0.5)
+        self.play(FadeIn(fproblem))
+        self.wait(1)
+        self.play(Write(fquestion))
+        self.wait(2)
+        self.play(fquestion.animate.set_color(YELLOW))
+        self.play(fproblem.animate.shift(UP * 1.8),ScaleInPlace(fquestion, 4/5),fquestion.animate.shift(UP * 1.8))
+        self.wait(1)
+
+        # Problem description
+        fsequence = MathTex(
+            r"\text{At } t=0, \text{ we have 1 branch } \quad \Leftrightarrow \quad a_0 = 1",
+            font_size=24
+        )
+        fsequence.next_to(fproblem, DOWN, buff=1.1)
+        self.play(Write(fsequence))
+        self.wait(2)
+
+        # Visual representation of months
+        months_title = Text("Defining a Sequence", font_size=18, color=YELLOW)
+        months_title.next_to(fsequence, DOWN, buff=0.6)
+        self.play(Write(months_title))
+
+        # Create month displays
+        month_displays = VGroup()
+        for month in range(6):
+            month_group = VGroup()
+
+            # Month label
+            month_label = Text(f"Month{month}", font_size=16)
+            month_group.add(month_label)
+
+            # Branch visualization
+            if month == 0:
+                branches = 1
+                bnum = 0
+                branch_viz = Line(ORIGIN, UP * 0.5, color=WHITE)
+            elif month == 1:
+                branches = 1
+                bnum = 1
+                branch_viz = Line(ORIGIN, UP * 0.5, color=WHITE)
+            elif month == 2:
+                branches = 2
+                bnum = 2
+                branch_viz = VGroup(
+                    Line(ORIGIN, UP * 0.5, color=WHITE),
+                    Line(RIGHT * 0.3, RIGHT * 0.3 + UP * 0.3, color=GREEN)
+                )
+            elif month == 3:
+                branches = 3
+                bnum = 3
+                branch_viz = VGroup(
+                    Line(ORIGIN, UP * 0.5, color=WHITE),
+                    Line(RIGHT * 0.3, RIGHT * 0.3 + UP * 0.3, color=WHITE),
+                    Line(LEFT * 0.3, LEFT * 0.3 + UP * 0.3, color=GREEN)
+                )
+            elif month == 4:
+                branches = 5
+                bnum = 4
+                branch_viz = VGroup(
+                    Line(ORIGIN, UP * 0.5, color=WHITE),
+                    Line(RIGHT * 0.2, RIGHT * 0.2 + UP * 0.2, color=WHITE),
+                    Line(LEFT * 0.2, LEFT * 0.2 + UP * 0.2, color=WHITE),
+                    Line(LEFT * 0.3, LEFT * 0.3 + UP * 0.3, color=GREEN),
+                    Line(RIGHT * 0.3, RIGHT * 0.3 + UP * 0.3, color=GREEN)
+                )
+            else:
+                branches = 8
+                bnum = 5
+                branch_viz = VGroup(
+                    Line(ORIGIN, UP * 0.5, color=WHITE),
+                    Line(RIGHT * 0.1, RIGHT * 0.1 + UP * 0.1, color=WHITE),
+                    Line(LEFT * 0.1, LEFT * 0.1 + UP * 0.1, color=WHITE),
+                    Line(LEFT * 0.2, LEFT * 0.2 + UP * 0.2, color=GREEN),
+                    Line(RIGHT * 0.2, RIGHT * 0.2 + UP * 0.2, color=GREEN),
+                    Line(LEFT * 0.3, LEFT * 0.3 + UP * 0.3, color=GRAY),
+                    Line(RIGHT * 0.3, RIGHT * 0.3 + UP * 0.3, color=GRAY),
+                    Line(RIGHT * 0.4, RIGHT * 0.4 + UP * 0.4, color=GREEN_E)
+                )
+
+            branch_viz.next_to(month_label, DOWN, buff=0.2)
+            month_group.add(branch_viz)
+
+            # Count
+            count = MathTex(f"a_{{{bnum}}} = {branches}", font_size=22, color=ORANGE)
+            count.next_to(branch_viz, DOWN, buff=0.2)
+            month_group.add(count)
+
+            month_group.move_to(LEFT * 2.9 + RIGHT * month * 1.2 + DOWN * 1.7)
+            month_displays.add(month_group)
+
+        self.play(AnimationGroup(*[Write(display) for display in month_displays], lag_ratio=0.5))
+        self.wait(2)
+        self.clear()
+
+        # Show the pattern
+        pattern_title = Text("Analysing the sequence:", font_size=32, color=GREEN).shift(UP * 2.1)
+        self.wait(1)
+        self.play(Write(pattern_title))
+        self.wait(1.5)
+        self.play(pattern_title.animate.shift(LEFT * 3))
+        month_displays_copy = month_displays.copy().next_to(pattern_title, RIGHT, buff = 0.4).scale(0.9)
+        self.play(AnimationGroup(*[Write(display) for display in month_displays_copy], lag_ratio=0.5))
+
+        # The recurrence relation
+        recurrence = MathTex(
+            r"\begin{gathered}"
+            r"\text{The branches at time } t=n-1 \text{ still exist at time } t=n \\"
+            r"\end{gathered}",
+            font_size=32
+        )
+        recurrence.next_to(pattern_title, DOWN, buff=0.9).shift(RIGHT * 1.8)
+        recurrence1= MathTex(
+            r"\begin{gathered}"
+            r"\Rightarrow \; a_n = a_{n-1} + N \; | \; N \;\text{is the number of new branches produced in month n}"
+            r"\end{gathered}",
+            font_size=32).next_to(recurrence, DOWN)
+
+        initial_conditions = MathTex(
+            r"\text{Only branches at least two months old produce new ones.}",
+            font_size=30
+        )
+        inc2 = MathTex(
+            r"\text{Only Branches at time } t=n-2 \text{ produce new branches}", font_size=30)
+        inc3 = MathTex(r"\Rightarrow N = a_{n-2}", font_size=30)
+
+        initial_conditions.next_to(recurrence1, DOWN, buff=0.8)
+        inc2.next_to(recurrence1, DOWN, buff=0.8)
+        inc3.next_to(inc2, DOWN)
+
+        self.wait(2)
+        self.play(Write(recurrence))
+        self.wait(2)
+        self.play(Write(recurrence1))
+        self.wait(2)
+        self.play(Write(initial_conditions))
+        self.wait(1)
+        self.play(Transform(initial_conditions, inc2))
+        self.wait(1)
+        self.play(FadeIn(inc3))
+        self.wait(2)
+
+        fibonacci_note = MathTex(
+            r"\left\{ \begin{aligned}"
+            r"& a_n = a_{n-1} + a_{n-2} \\"
+            r"& a_0 = 1 \\"
+            r"& a_1 = 1"
+            r"\end{aligned} \right.",
+            font_size=32
+        )
+        fibonacci_note.next_to(inc3, DOWN, buff=0.3)
+        self.play(initial_conditions.animate.shift(UP * 0.2), inc3.animate.shift(UP * 0.2))
+        self.play(Write(fibonacci_note))
+        self.wait(2)
+
+
+class BackwardSubstitution(Scene):
+    def construct(self):
+        title = Text("Backward Substitution", font_size=36, color=BLUE)
+        self.play(Write(title))
+        self.wait(2)
+        self.play(title.animate.to_edge(UP, buff = 1))
+        self.wait(1)
+
+        recurrence = MathTex(r"\left\{ \begin{aligned}"
+                             r"&a_n = 2a_{n-1} + 1 \\"
+                             r"&a_1 = 1"
+                             r"\end{aligned} \right.",
+                             font_size=35   ).next_to(title, DOWN, buff=0.6)
+
+        self.play(Write(recurrence))
+        self.wait(1)
+
+        # Example recurrence
+        example_title = MathTex(" \Rightarrow \; a_{n-1} = 2a_{n-2} + 1", font_size=35, color=WHITE)
+        example_title.next_to(recurrence, DOWN, buff=0.4)
+
+        self.play(Write(example_title))
+        self.wait(1)
+        self.play(Transform(example_title, MathTex(" \Rightarrow \; a_{n-2} = 2a_{n-3} + 1", font_size=35, color=WHITE).next_to(recurrence, DOWN, buff=0.4)))
+        self.wait(2)
+        self.play(FadeOut(example_title))
+
+        # Initial equation
+        eq_initial = MathTex(r"a_n = 2",r"a_{n-1}",r" + 1", font_size=36)
+        eq_initial.next_to(example_title, DOWN, buff=0.1)
+        self.play(Write(eq_initial))
+        self.wait(1)
+        self.play(eq_initial[1].animate.set_color(YELLOW))
+        self.wait(1)
+
+        # Step 1
+        eq_step1_substituted_form = MathTex(r"a_n = 2",r"(2a_{n-2} + 1)",r" + 1", font_size=36)
+        eq_step1_substituted_form.move_to(eq_initial)
+        eq_step1_substituted_form[1].set_color(YELLOW)
+        self.play(ReplacementTransform(eq_initial, eq_step1_substituted_form))
+        self.wait(1)
+
+        # Simplify Step 1
+        eq_step1_simplified = MathTex(r"a_n = ",r"2^2",r"a_{n-2}",r" + 2",r" + 1", font_size=36)
+        eq_step1_simplified.move_to(eq_step1_substituted_form)
+        eq_step1_simplified[1].set_color(YELLOW)
+        eq_step1_simplified[2].set_color(YELLOW)
+        eq_step1_simplified[3].set_color(YELLOW)
+        self.play(ReplacementTransform(eq_step1_substituted_form, eq_step1_simplified))
+        self.wait(1)
+        self.play(eq_step1_simplified[2].animate.set_color(GREEN))
+        self.wait(1)
+
+        # Step 2
+        eq_step2_substituted_form = MathTex(r"a_n = ",r"2^2",r"(2a_{n-3} + 1)",r" + 2 ",r"+ 1", font_size=36)
+        eq_step2_substituted_form.move_to(eq_step1_simplified)
+        eq_step2_substituted_form[1].set_color(YELLOW)
+        eq_step2_substituted_form[2].set_color(GREEN)
+        eq_step2_substituted_form[3].set_color(YELLOW)
+
+        self.play(ReplacementTransform(eq_step1_simplified, eq_step2_substituted_form))
+        self.wait(1)
+
+        # Simplify Step 2
+        eq_step2_simplified = MathTex(r"a_n = ",r"2^3a_{n-3} + 2^2",r" + 2",r" + 1", font_size=36)
+        eq_step2_simplified.move_to(eq_step2_substituted_form)
+        eq_step2_simplified[1].set_color(GREEN)
+        eq_step2_simplified[2].set_color(YELLOW)
+        self.play(ReplacementTransform(eq_step2_substituted_form, eq_step2_simplified))
+        self.wait(1)
+
+        # General pattern
+        pattern = MathTex(r"a_n =",r" 2^{n-1}a_1 + 2^{n-2} + 2^{n-3} + \cdots + 2 + 1", font_size=36)
+        pattern[1].set_color_by_gradient(BLUE, YELLOW)
+        pattern.move_to(eq_step2_simplified)
+        self.play(ReplacementTransform(eq_step2_simplified, pattern))
+        self.wait(1)
+
+        pattern2 = MathTex(r"a_n =", r" 2^{n-1} + 2^{n-2} + 2^{n-3} + \cdots + 2 + 1", font_size=36)
+        pattern2[1].set_color_by_gradient(BLUE, YELLOW)
+        pattern2.move_to(eq_step2_simplified)
+        self.play(Transform(pattern, pattern2))
+        self.wait(2)
+
+        # Geometric series
+        geometric = MathTex(r"\Rightarrow \; \sum_{k=0}^{n-1} 2^k", font_size=32)
+        geometric.next_to(pattern, DOWN, buff=0.3)
+        self.play(Write(geometric))
+        self.wait(1)
+        self.play(geometric.animate.shift(LEFT * 1.5))
+
+        # Final result
+        result = MathTex(r"\text{Sum of a G.S} = \frac{a_1 (1 - r^n)}{1-r} ", font_size=30, color=GREEN)
+        result.next_to(geometric, RIGHT, buff=0.4)
+        self.play(Write(result))
+        self.wait(1)
+        self.play(Transform(result, MathTex(r"\text{Sum of a G.S} = \frac{1 - 2^n}{-1} ", font_size=30, color=GREEN).next_to(geometric, RIGHT, buff=0.5) ))
+        self.wait(0.5)
+        self.play(Transform(result, MathTex(r"\text{Sum of a G.S} = 2^n-1 ", font_size=30, color=GREEN).next_to(geometric, RIGHT, buff=0.5).shift(DOWN * 0.05)))
+
+        # Verification note
+        verify = Text("Always verify your solution by substituting back!",
+                      font_size=20, color=ORANGE)
+        verify.next_to(result, DOWN, buff=0.8).shift(LEFT * 1.2)
+        self.wait(2)
+        self.play(Write(verify))
+        self.wait(2)
+
+        tr1 = MathTex(
+            r"\left\{ \begin{aligned}"
+            r"&2^n - 1 = 2(2^{n - 1} - 1) + 1 \\"
+            r"&a_1 = 1"
+            r"\end{aligned} \right.",
+            font_size=34).next_to(title, DOWN, buff=0.6)
+
+        self.play(FadeTransform(recurrence, tr1, path_arc= 0))
+        self.wait(1)
+        self.play(FadeTransform(tr1, MathTex(
+            r"\left\{ \begin{aligned}"
+                r"&2^n - 1 = 2^n- 1 \\"
+                r"&a_1 = 1"
+                r"\end{aligned} \right.",
+                font_size=35).next_to(title, DOWN, buff=0.6)))
+        self.wait(2)
+
+
+class CharacteristicMethod(Scene):
+    def construct(self):
+        title = Text("Characteristic Equation", font_size=36, color=BLUE)
+        self.play(Write(title))
+        self.wait(1)
+        self.play(FadeOut(title))
+
+        # Definition
+        definition = Text("For a Homogeneous Linear Recurrence:", font_size=28, color=YELLOW)
+        definition.to_edge(UP).shift(DOWN * 0.6)
+        self.play(Write(definition))
+
+        general_form = MathTex(
+            r"\begin{cases}"
+            r"a_n = c_1 a_{n-1} + c_2 a_{n-2} + \cdots + c_k a_{n-k}, & \forall\, n \ge k, \\"
+            r"a_0 = A_0, \\"
+            r"a_1 = A_1, \\"
+            r"\vdots \\"
+            r"a_{k-1} = A_{k-1},"
+            r"\end{cases}",
+            font_size=35
+        )
+        general_form.next_to(definition, DOWN, buff=0.5)
+        self.play(Write(general_form))
+        self.wait(1)
+
+        sform = MathTex(r"a_n = c_1 a_{n-1} + c_2 a_{n-2} + \cdots + c_k a_{n-k}", font_size= 35, color=YELLOW).next_to(general_form, DOWN, buff=0.6 )
+        self.play(Write(sform))
+        self.wait(1)
+
+        # Characteristic equation
+        char_title = MathTex(r"\text{Substitute $a_n$ $\rightarrow$ $x^n$ to get the equation:", font_size=30)
+        char_title.next_to(sform, DOWN, buff=0.5)
+        self.play(Write(char_title))
+        self.wait(1)
+
+        char_eq = MathTex(r"x^n - c_1 x^{n-1} - c_2 x^{n-2} - \cdots - c_k x^{n-k} = 0", font_size=35)
+        char_eq.next_to(char_title, DOWN, buff=0.4)
+        self.play(Write(char_eq))
+        self.wait()
+        self.play(Transform(char_eq, MathTex("x^k - c_1 x^{k-1} - c_2 x^{k-2} - \cdots - c_{k-1}x - c_k = 0", font_size=40, color = BLUE).next_to(char_title, DOWN, buff=0.4)))
+        self.wait(2)
+        self.clear()
+        self.wait(1)
+
+        # Sadly can't talk about functional analysis
+
+        charp = MathTex("x^k - c_1 x^{k-1} - c_2 x^{k-2} - \cdots - c_{k-1}x - c_k = 0", font_size=40, color = BLUE)
+        self.play(FadeIn(charp.to_edge(UP).shift(DOWN * 0.75)))
+        self.wait(1)
+
+        text1 = Tex(
+            r"Let $\lambda_1, \ldots, \lambda_\ell$ be the distinct, nonzero (possibly complex) roots ",
+            r"of the characteristic equation, with respective multiplicities ",
+            r"$m_1, \ldots, m_\ell$.",
+            font_size=30,
+            tex_to_color_map= {r"$\lambda_1, \ldots, \lambda_\ell$": PURPLE,}
+        ).next_to(charp, DOWN, buff=0.5)
+
+        text2 = Tex(
+            r"There exist a set of polynomials $p_1(n), \ldots, p_\ell(n)$ of degrees at most ",
+            r"$m_1 - 1, \ldots, m_\ell - 1$, respectively, ",
+            r"such that the general recurrence term is:",
+            font_size=30
+        ).next_to(text1, DOWN, buff=0.6)
+
+        # General solution formula
+        eq = MathTex(
+            r"a_n = p_1(n)\,\lambda_1^n + p_2(n)\,\lambda_2^n + \cdots + p_\ell(n)\,\lambda_\ell^n",
+            font_size=40
+        ).next_to(text2, DOWN, buff=0.8)
+
+        # Animations
+        self.play(Write(text1))
+        self.wait(2)
+        self.play(Write(text2))
+        self.wait(2)
+        self.play(Write(eq))
+        self.wait(2)
+        self.play(FadeToColor(eq, YELLOW))
+        self.wait(2)
+
+        self.clear()
+        self.wait(1)
+
+        self.play(FadeIn(charp.to_edge(UP).shift(DOWN * 0.75)))
+        self.wait(1)
+        soltxt = MathTex(r"\text{$k$-dimensional space set of solutions:} \\",
+                         r"\Rightarrow \; k \; \text{independent solutions}",
+                         font_size=29, color= WHITE).next_to(charp, DOWN, buff=0.6)
+        self.play(Write(soltxt[0]))
+        self.wait(1)
+        self.play(Write(soltxt[1].align_to(soltxt[0],LEFT).shift(RIGHT * 0.4)))
+        self.wait(1)
+        self.play(Transform(charp, MathTex(r"\{ \lambda_1, \ldots, \lambda_\ell \}",font_size=35, color= PURPLE).align_to(charp, DOWN)))
+        self.wait(1)
+        self.play(charp.animate.shift(LEFT * 1))
+        self.wait(0.5)
+        psol = MathTex(r"\forall \, \lambda, \; m=1", font_size=35, color= WHITE).next_to(charp, RIGHT, buff=0.4)
+        self.play(Write(psol))
+        self.wait(1)
+        indcase = MathTex(r"a_n = \delta_1\,\lambda_1^n + \delta_2\,\lambda_2^n + \cdots + \delta_\ell \,\lambda_\ell^n", font_size=35, color=YELLOW).next_to(soltxt, DOWN, buff=0.6)
+        self.play(Write(indcase))
+        ul1 = Underline(indcase, color = GOLD).align_to(soltxt, DOWN).shift(DOWN * 0.1)
+        self.wait(1)
+        self.play(FadeOut(soltxt),indcase.animate.align_to(soltxt,DOWN))
+        self.wait(0.5)
+        self.play(Write(ul1), run_time = 2)
+
+        lb2 = MathTex(r"\{ \lambda_1, \ldots, \lambda_\ell \}",font_size=35, color= ORANGE).next_to(indcase, DOWN, buff=0.9)
+        self.play(Write(lb2))
+        self.wait(1)
+        self.play(lb2.animate.shift(LEFT * 1))
+        self.wait(0.5)
+        lb2sol = MathTex(r"\exists \, \lambda_o \; | \; m_o > 1", font_size=35, color=WHITE).next_to(lb2, RIGHT, buff=0.4)
+        self.play(Write(lb2sol))
+        self.wait(1)
+        pfo = MathTex(r"p_o(n) \, \equiv \, \beta_0 + \beta_1n + \beta_2n^2 + \cdots + \beta_{m_o} n^{m_o -1} ",
+                      font_size=35).next_to(lb2 , DOWN, buff=0.6).shift(RIGHT)
+        indcase2 = MathTex(r"a_n = (\beta_0 + \beta_1n + \beta_2n^2)\,\lambda_1^n + \delta_2\,\lambda_2^n + \cdots + \delta_\ell \,\lambda_\ell^n", font_size=35,
+                          color=YELLOW).next_to(pfo , DOWN, buff=0.6)
+        self.play(Write(pfo))
+        self.wait(1)
+        self.play(Write(indcase2))
+        self.wait(0.5)
+        ul2 = Underline(indcase2, color = GOLD)
+        self.play(Write(ul2), run_time = 2)
+        self.wait(2)
+        self.clear()
+
+        r2b = MathTex(r"\{ \lambda_1, \ldots, \lambda_\ell \}", font_size=40).shift(UP * 1)
+        r2b.set_color(GREEN)
+
+        self.play(Write(r2b))
+        self.wait(0.5)
+        self.play(r2b.animate.shift(LEFT * 1))
+        self.wait(0.5)
+
+        clb = MathTex(
+            r"\exists \; \lambda_o \;|\quad \lambda_o \in \mathbb{C}",
+            font_size=35
+        ).next_to(r2b, RIGHT, buff=0.4)
+        self.play(Write(clb))
+        self.wait(1)
+
+        cnjg = MathTex(
+            r"\Leftrightarrow \; \exists \; \overline{\lambda_o} \quad|\quad (\lambda_o, \, \overline{\lambda_o})\text{ is a conjugate pair}",
+            font_size=35
+        ).next_to(ORIGIN, DOWN).shift(UP * 0.6)
+        self.play(Write(cnjg))
+        self.wait(2)
+        lroots = MathTex(
+            r"\lambda = re^{i\theta}, \quad \overline{\lambda} = re^{-i\theta}",
+            font_size=35).next_to(cnjg, DOWN, buff=0.5)
+        self.play(Write(lroots))
+        self.wait(2)
+        dmoivre  = MathTex(r"\lambda^n = r^n(\cos(n\theta) + i\sin(n\theta))", font_size=35).next_to(lroots, DOWN, buff=0.4)
+        self.play(Write(dmoivre))
+        self.wait(1)
+        cmpxan = MathTex(r"r^n \cos(n\theta) \quad",r" \text{and}",r" \quad r^n \sin(n\theta)", font_size=35).next_to(lroots, DOWN, buff=0.4)
+        cmpxan[0].set_color(TEAL)
+        cmpxan[2].set_color(RED)
+        self.play(Transform(dmoivre, cmpxan))
+        self.wait(1)
+        self.play(Transform(dmoivre, MathTex(r"a_n \, \sim \, r^n(",r"C\cos(n\theta)",r"+",r"D\sin(n\theta)",r")",
+                                             font_size=35,
+                                             tex_to_color_map={r"C\cos(n\theta)": TEAL,
+                                                               r"D\sin(n\theta)": RED,}).next_to(lroots, DOWN, buff=0.4) ))
+
+        self.wait(2)
+
+
+
+        self.clear()
+        #phi
+
+        fib_title = Text("Fibonacci Sequence", font_size=28, color=YELLOW)
+        fib_title.align_to(definition, DOWN)
+        self.play(Write(fib_title))
+
+        fib_recurrence =MathTex(
+            r"\left\{ \begin{aligned}"
+            r"& a_n = a_{n-1} + a_{n-2} \\"
+            r"& a_0 = 0 \\"
+            r"& a_1 = 1"
+            r"\end{aligned} \right.", font_size=32)
+
+        fib_recurrence.next_to(fib_title, DOWN, buff=0.5)
+        self.play(Write(fib_recurrence))
+        self.wait(1)
+
+        # Characteristic equation for Fibonacci
+        fib_char = MathTex(r"a_n - a_{n-1} - a_{n-2} = 0", font_size=32)
+        fib_char2 = MathTex(r"x^2 - x - 1 = 0", font_size=32).next_to(fib_recurrence, DOWN, buff=0.8)
+        fib_char.next_to(fib_recurrence, DOWN, buff=0.8)
+        self.play(Write(fib_char))
+        self.wait(1)
+        self.play(ReplacementTransform(fib_char, fib_char2))
+        self.wait(1)
+        self.play(fib_char2.animate.shift(LEFT * 1.2))
+
+        # quadratic
+
+        pr2 = MathTex(r"\frac{-b \pm \sqrt{b^2-4ac}}{2a}", font_size=30).next_to(fib_char, RIGHT, buff=0.8).shift(LEFT * 1.6)
+        self.play(Write(pr2))
+        self.wait(1)
+        spr2 = MathTex(r"\frac{1 \pm \sqrt{5}}{2}", font_size=30).next_to(fib_char, RIGHT, buff=0.4).next_to(fib_char, RIGHT, buff=0.8).align_to(pr2, LEFT).shift(RIGHT * 0.2)
+        self.play(ReplacementTransform(pr2, spr2))
+        self.wait(1)
+
+        # Roots
+        roots = MathTex(r"x_1 = \frac{1 + \sqrt{5}}{2}, \quad x_2 = \frac{1 - \sqrt{5}}{2}",
+                        font_size=30).next_to(fib_char, DOWN, buff=0.8)
+        roots2 = MathTex(r"\phi_1",r" = \frac{1 + \sqrt{5}}{2}, \quad ",r"\phi_2",r" = \frac{1 - \sqrt{5}}{2}",
+                        font_size=30,
+                         tex_to_color_map={r"\phi_1": YELLOW,
+                                           r"\phi_2": YELLOW})
+        roots2.next_to(fib_char, DOWN, buff=0.8)
+        self.play(fib_char2.animate.shift(RIGHT * 1.2),ReplacementTransform(spr2, roots))
+        self.wait(1)
+        self.play(TransformMatchingTex(roots, roots2))
+        self.wait(2)
+
+        sgroup = VGroup(fib_char2,fib_recurrence, fib_title, roots2)
+        self.play(FadeOut(sgroup))
+
+        self.wait(2)
+
+        # General solution
+        solution_title = Text("General Solution", font_size=30, color=GREEN)
+        solution_title.align_to(fib_title, DOWN)
+        self.play(Write(solution_title))
+        self.wait(2)
+
+        solution = indcase.copy().next_to(solution_title, DOWN, buff=0.5).set_color(WHITE)
+
+        solution1 = MathTex(
+            r"a_n = \delta_1 ",r"\phi_1^n",r" + \delta_2 ",r"\phi_2^n",
+            font_size=35,
+            tex_to_color_map={
+                r"\phi_1^n": YELLOW,
+                r"\phi_2^n": YELLOW
+            }
+        )
+        solution1.next_to(solution_title, DOWN, buff=0.5)
+        self.play(Write(solution))
+        self.wait(2)
+        self.play(ReplacementTransform(solution, solution1))
+        self.wait(2)
+        solution2 = MathTex(r"a_n = \delta_1 \left(\frac{1+\sqrt{5}}{2} \right)^n + \delta_2\left(\frac{1-\sqrt{5}}{2}\right)^n", font_size=30).next_to(solution_title, DOWN, buff=0.3)
+        self.play(ReplacementTransform(solution1, solution2))
+        self.wait(2)
+        ssystem1 = MathTex(
+            r"\left\{ \begin{aligned}"
+            r"& a_0 = 0 \\"
+            r"& a_1 = 1"
+            r"\end{aligned} \right.", font_size=30).next_to(solution2, DOWN, buff=0.6)
+
+        ssystem2 = MathTex(
+            r"\left\{ \begin{aligned}"
+            r"& \delta_1\left(\frac{1+\sqrt{5}}{2}\right)^0 + \delta_2\left(\frac{1-\sqrt{5}}{2}\right)^0 = 0 \\"
+            r"& \delta_1\left(\frac{1+\sqrt{5}}{2}\right)^1 + \delta_2\left(\frac{1-\sqrt{5}}{2}\right)^1 = 1"
+            r"\end{aligned} \right.", font_size=30).next_to(solution2, DOWN, buff=0.6).align_to(solution2, LEFT)
+
+        ssystem3 = MathTex(r"\left\{ \begin{aligned}"
+                          r"& \delta_1 + \delta_2 = 0 \\"
+                          r"& \delta_1\left(\frac{1+\sqrt{5}}{2}\right) + \delta_2\left(\frac{1-\sqrt{5}}{2}\right) = 1"
+                           r"\end{aligned} \right.", font_size=30).next_to(solution2, DOWN, buff=0.6).align_to(solution2, LEFT)
+
+        self.play(Write(ssystem1))
+        self.wait(2)
+        self.play(ReplacementTransform(ssystem1, ssystem2))
+        self.wait(2)
+        self.play(ReplacementTransform(ssystem2, ssystem3))
+        self.wait(2)
+        self.play(Transform(ssystem3, MathTex(r"(\delta_1, \, \delta_2) = (\frac{1}{\sqrt{5}}, \, \frac{-1}{\sqrt{5}})", font_size=30).next_to(solution2, DOWN, buff=0.6)))
+        self.wait(2)
+
+        # Binet's formula
+        binet = MathTex(
+            r"a_n = \frac{1}{\sqrt{5}}\left[\left(\frac{1+\sqrt{5}}{2}\right)^n - \left(\frac{1-\sqrt{5}}{2}\right)^n\right]",
+            font_size=30)
+        binet.next_to(ssystem3, DOWN, buff=1.2).shift(LEFT * 0.4)
+
+        binet_label = Text("Binet's Formula:", font_size=26, color=BLUE)
+        binet_label.next_to(binet, UP, buff=0.4).shift(RIGHT * 0.4)
+
+        self.play(Write(binet_label))
+        self.play(Write(binet))
+        self.wait(2)
+
+
+class GeneratingFunctions(Scene):
+    def construct(self):
+        title = Text("Generating Functions", font_size=36, color=BLUE)
+        self.play(Write(title))
+        self.play(title.animate.to_edge(UP, buff=1.5))
+
+        # Definition
+        definition = Text("Associate a power series with the sequence:", font_size=24)
+        definition.next_to(title, DOWN, buff=0.4)
+        self.play(Write(definition))
+
+        rsquel = MathTex(r"a_n = a_0 + c_1 a_{1} + c_2 a_{2} + c_3 a_{3} + \cdots", font_size= 30).next_to(definition, DOWN, buff=0.4)
+
+        power_series = MathTex(r"F(x) = \sum_{n=0}^{\infty} k_n x^n = k_0 + k_1 x + k_2 x^2 + k_3 x^3 + \cdots",
+                               font_size=30)
+        power_series.next_to(rsquel, DOWN, buff=0.4)
+        self.play(Write(rsquel))
+        self.wait(1)
+        self.play(Write(power_series))
+        self.wait(1)
+        self.play(FadeOut(rsquel),Transform(power_series, MathTex(r"F(x) = \sum_{n=0}^{\infty} a_n x^n = a_0 + a_1 x + a_2 x^2 + a_3 x^3 + \cdots",
+                               font_size=30).next_to(rsquel, DOWN, buff=-0.1)))
+
+        feq = MathTex(r"\Rightarrow \; \text{Establish a functional equation}", font_size=35, color=YELLOW).next_to(power_series, DOWN, buff=0.8)
+        self.wait(1)
+        self.play(Write(feq))
+        self.wait(2)
+        self.clear()
+
+        # Example
+        example_title = Text("Example:", font_size=24, color=YELLOW)
+        example_title.align_to(title, DOWN)
+
+        example_recurrence = MathTex(r"\left\{ \begin{aligned}"
+                                     r"&a_n = 2a_{n-1} \\"
+                                     r"&a_1 = 1"
+                                     r"\end{aligned} \right.", font_size=28)
+        example_recurrence.next_to(example_title, DOWN, buff=0.5)
+
+        self.play(Write(example_title))
+        self.wait(1)
+        self.play(Write(example_recurrence))
+        self.wait(1)
+        self.play(example_recurrence.animate.shift(LEFT))
+        self.wait(0.5)
+
+        # Generating function setup
+        setup = MathTex(r"F(x) = ",r"\sum_{n=0}^{\infty} a_n x^n", font_size=28)
+        setup.next_to(example_recurrence, RIGHT, buff=0.8)
+        self.play(Write(setup))
+
+        # Functional equation
+        func_eq_title = MathTex(r"\text{$\Rightarrow$ Functional equation:", font_size=30)
+        func_eq_title.next_to(example_title, DOWN, buff=1.7)
+        self.play(Write(func_eq_title))
+
+        func_eq0 = MathTex(r"F(x) = \sum_{n=0}^{\infty} (2a_{n-1}) x^n", font_size=32).next_to(func_eq_title, DOWN, buff=0.3)
+        func_eq = MathTex(r"F(x) = a_0 +",r" \sum_{n=1}^{\infty} (2a_{n-1}) x^n", font_size=32).next_to(func_eq_title, DOWN, buff=0.3)
+        func_eq1 = MathTex(r"F(x) = a_0 +",r"2x\sum_{n=1}^{\infty} (a_{n-1}) x^{n-1}", font_size=32).next_to(func_eq_title, DOWN, buff=0.3)
+        func_eq.next_to(func_eq_title, DOWN, buff=0.3)
+        self.play(Write(func_eq0))
+        self.wait(1)
+        self.play(ReplacementTransform(func_eq0, func_eq))
+        self.wait(1)
+        self.play(ReplacementTransform(func_eq[0], func_eq1[0]),ReplacementTransform(func_eq[1], func_eq1[1]))
+        self.wait(1)
+        self.play(func_eq1.animate.shift(LEFT))
+        tsub = MathTex(r"t + 1= n", font_size=32, color= GREEN).next_to(func_eq1, RIGHT, buff=0.4)
+        self.play(Write(tsub))
+        self.wait(1)
+        frec = MathTex(r"F(x) = a_0 + 2x",r"\sum_{t=0}^{\infty} (a_{t}) x^{t}", font_size=32).next_to(func_eq_title, DOWN, buff=0.3).shift(LEFT)
+        self.play(ReplacementTransform(func_eq1[0], frec[0]),ReplacementTransform(func_eq1[1], frec[1]))
+        self.wait(1)
+        self.play(FadeOut(tsub))
+        self.play(frec.animate.shift(RIGHT))
+        self.wait(2)
+        self.play(setup[1].animate.set_color(GREEN))
+        self.play(frec[1].animate.set_color(GREEN))
+        self.wait(2)
+
+        # Simplification
+        simplify = MathTex(r"F(x) = 1 + 2x F(x)", font_size=32)
+        simplify.next_to(func_eq, DOWN, buff=0.5).shift(RIGHT)
+        self.play(Write(simplify))
+        self.wait(1)
+        self.play(simplify.animate.shift(LEFT * 1.6))
+
+        # Solve for F(x)
+        solve = MathTex(r"\quad\Leftrightarrow\quad",r"F(x) = \frac{1}{1-2x}", font_size=32,
+                        tex_to_color_map={r"F(x) = \frac{1}{1-2x}": YELLOW})
+        solve.next_to(simplify, RIGHT, buff=0.5)
+        self.play(Write(solve))
+        self.wait(2)
+        self.clear()
+
+        #Taylor Polynomials
+
+        t1 = MathTex(r"\text{Taylor's approximation}", font_size=32, color=YELLOW).align_to(example_title, DOWN)
+        t2 = MathTex(r"\begin{gathered}"
+            r"\text{For any analytical function} \\ \\"
+            r"f(x) = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 +\cdots + \frac{f^{(n)}(a)}{n!}(x-a)^n"
+            r"\end{gathered}", font_size=32).next_to(t1, DOWN, buff=0.6)
+        t3 = MathTex(r"f(x) = \sum_{n=0}^{\infty} \frac{f^{(n)}(a)}{n!}(x-a)^n", font_size=32).next_to(t2, DOWN, buff=0.6)
+
+        self.wait(1)
+        self.play(Write(t1))
+        self.wait(1)
+        self.play(Write(t2))
+        self.wait(1)
+        self.play(Write(t3))
+        self.wait(2)
+        self.clear()
+
+        #funcs
+
+        self.wait(1)
+        ffunc = MathTex(r"F(x) = \frac{1}{1-2x}", font_size=32, color=YELLOW).align_to(example_title, DOWN).shift(DOWN * 0.5)
+        tfunc = MathTex(r"F(x) = \sum_{n=0}^{\infty} ",r"\frac{F^{(n)}(0)}{n!}(x)^n", font_size=32).next_to(ffunc, DOWN, buff=0.4)
+
+        self.play(Write(ffunc))
+        self.wait(1)
+        self.play(Write(tfunc))
+
+        eq1 = MathTex(r"\begin{gathered}"
+            r"1.\; F(x) = (1 - 2x)^{-1} \\"
+            r"F(0) = 1"
+                      r"\end{gathered}",
+            font_size=26
+        )
+        eq2 = MathTex(r"\begin{gathered}"
+            r"2.\; F'(x) = 2(1 - 2x)^{-2} \\"
+                      r"F'(0) = 2"
+                      r"\end{gathered}",
+            font_size=26
+        )
+        eq3 = MathTex(r"\begin{gathered}"
+            r"3.\; F''(x) = 8(1 - 2x)^{-3} \\"
+            r"F''(0) = 8"
+                      r"\end{gathered}",
+            font_size=26
+        )
+        eq4 = MathTex(r"\begin{gathered}"
+            r"4.\; F^{(3)}(x) = 48(1 - 2x)^{-4} \\"
+            r"F^{(3)}(0) = 48"
+            r"\end{gathered}",
+            font_size=26
+        )
+
+        # Stack
+        group =VGroup(eq1, eq2).arrange(DOWN, aligned_edge=LEFT, buff=0.6).next_to(tfunc, DOWN, buff= 0.4).shift(LEFT * 1.5)
+        group2 = VGroup(eq4, eq3).arrange(DOWN, aligned_edge=LEFT, buff=0.6).next_to(group,RIGHT * 1.1)
+        self.wait(2)
+        self.play(Write(group),Write(group2))
+        self.wait(2)
+        self.play(FadeOut(group),FadeOut(group2))
+        self.wait(1)
+
+        formula = MathTex(
+            r"F^{(n)}(x) = n! \cdot 2^n \cdot (1 - 2x)^{-(n+1)}",
+            font_size=32
+        ).align_to(group, UP).shift(DOWN * 0.5)
+
+        formula2 = MathTex(r"F(x) = \sum_{n=0}^{\infty} ",r"\frac{n! \cdot 2^n \cdot (1)^{-(n+1)}}{n!}(x)^n", font_size= 32).align_to(tfunc, DOWN)
+
+        self.play(Write(formula))
+        self.wait(1)
+        self.play(FadeOut(formula))
+        self.wait(2)
+        self.play(Transform(tfunc[0], formula2[0]), Transform(tfunc[1], formula2[1]))
+        self.wait(2)
+
+        formula3 = MathTex(r"\Rightarrow \; F(x) = \sum_{n=0}^{\infty} ", r" (\,2^n\,)x^n",
+                           font_size=32).next_to(formula2, DOWN, buff=0.8)
+        self.play(Write(formula3))
+        self.wait(2)
+        self.play(Transform(formula3, MathTex(r"F(x) = 1 + 2x + 4x^2 + 8x^3 + 16x^4 + \dots + 2^n x^n", font_size= 32).align_to(formula3, DOWN)))
+        self.wait(2)
+        self.clear()
+        self.wait(1)
+
+        resenha = MathTex(r"F(x) = ",r"a_0",r" + ",r"a_1",r"x + ",r"a_2",r"x^2 + ",r"a_3",r"x^3 +",r" \cdots",
+                          font_size= 32,
+                          tex_to_color_map={r"a_0":YELLOW,
+                                            r"a_1":YELLOW,
+                                            r"a_2":YELLOW,
+                                            r"a_3":YELLOW,
+                                            r" \cdots":YELLOW}).align_to(formula2, DOWN).shift(UP * 0.5)
+        self.play(Write(resenha))
+        self.wait(1)
+        parts = [
+            r"F(x) =", r"1", r"+", r"2", r"x+", r"4", r"x^2+",
+            r"8", r"x^3+", r"16", r"x^4+", r"\cdots", r"+", r"2^n", r"x^n"
+        ]
+
+        fte = MathTex(*parts, font_size=32).next_to(resenha, DOWN, buff=0.8)
+
+        # coefficients
+        coeff_tokens = {"1", "2", "4", "8", "16", "2^n", "\cdots"}
+
+        for i, token in enumerate(parts):
+            if token in coeff_tokens:
+                fte[i].set_color(YELLOW)
+
+        self.play(Write(fte))
+        self.wait(1)
+        self.play(Write(MathTex(r"\Rightarrow \; a_n = 2^n", font_size= 32, color=YELLOW).next_to(fte, DOWN, buff= 0.8)))
+        self.wait(2)
+
+        self.clear()
+
+        # Expand using geometric series
+        expand_title = MathTex(r"\frac{1}{1-2x} \; \equiv \; \frac{a_1}{1-r}", font_size=32).next_to(title, DOWN, buff=0.1)
+        expand_title2 = MathTex(r"a_n \; \longrightarrow \; G.S\,(r = 2x)", font_size=32).next_to(expand_title, DOWN, buff=0.6)
+        self.wait(2)
+        self.play(Write(expand_title))
+        self.wait(1)
+        self.play(Write(expand_title2))
+        self.wait(1)
+
+        expand = MathTex(r"F(x) = \sum_{n=0}^{\infty} (2x)^n", font_size=28)
+        expand.next_to(expand_title2, DOWN, buff=0.4)
+        self.play(Write(expand))
+        self.wait(1)
+        self.play(expand.animate.shift(LEFT * 1.2))
+        self.wait(1)
+
+        # Final result
+        result = MathTex(r"\quad\Leftrightarrow\quad",r"a_n = 2^n", font_size=32,
+                         tex_to_color_map={r"a_n = 2^n":GREEN})
+        result.next_to(expand, RIGHT, buff=0.4)
+        self.play(Write(result))
+        self.wait(2)
+
+#-----------------------------------------------------------------------------------------------------------------------
+# GOLD GOLD GOLD
+# ----------------------------------------------------------------------------------------------------------------------
+class GenFunctionGold(Scene):
+    def construct(self):
+        example_title = Text("Example:", font_size=24, color=YELLOW)
+        example_title.to_edge(UP, buff=1.5)
+
+        example_recurrence = MathTex(
+            r"\left\{ \begin{aligned}"
+            r"a_n &= a_{n-1} + a_{n-2} \\"
+            r"a_0 &= 0 \\"
+            r"a_1 &= 1"
+            r"\end{aligned} \right.",
+            font_size=28
+        )
+        example_recurrence.next_to(example_title, DOWN, buff=0.2)
+        self.wait(1)
+        self.play(Write(example_recurrence))
+        self.wait(1)
+        self.play(example_recurrence.animate.shift(LEFT * 1.2))
+        self.wait(0.5)
+
+        # Generating function setup
+        setup = MathTex(r"F(x) = ", r"\sum_{n=0}^{\infty} a_n x^n", font_size=28)
+        setup.next_to(example_recurrence, RIGHT, buff=0.4).shift(DOWN * 0.05)
+        self.play(Write(setup))
+
+        # Functional equation
+        func_eq_title = MathTex(r"\text{$\Rightarrow$ Functional equation:}", font_size=30)
+        func_eq_title.next_to(example_recurrence, DOWN, buff=0.4).shift(RIGHT * 1.2)
+        self.play(Write(func_eq_title))
+
+        # Corrected LaTeX for functional equations
+        func_eq0 = MathTex(r"F(x) = \sum_{n=0}^{\infty} (a_{n-1} + a_{n-2}) x^n", font_size=32).next_to(func_eq_title,
+                                                                                                        DOWN, buff=0.4)
+        func_eq = MathTex(r"F(x) = a_0 + a_1 x + \sum_{n=2}^{\infty} (a_{n-1} + a_{n-2}) x^n", font_size=32).next_to(
+            func_eq_title, DOWN, buff=0.3)
+        func_eq1 = MathTex(r"F(x) = a_0 + a_1 x + \sum_{n=2}^{\infty} a_{n-1} x^n + \sum_{n=2}^{\infty} a_{n-2} x^n",
+                           font_size=32).next_to(func_eq_title, DOWN, buff=0.3)
+        func_eq2 = MathTex(
+            r"F(x) = a_0 + a_1 x + x \sum_{n=2}^{\infty} a_{n-1} x^{n-1} + x^2 \sum_{n=2}^{\infty} a_{n-2} x^{n-2}",
+            font_size=32).next_to(func_eq_title, DOWN, buff=0.3)
+        func_eq3 = MathTex(r"F(x) = a_0 + a_1 x + x (F(x) - a_0) + x^2 F(x)", font_size=32).next_to(func_eq_title, DOWN,
+                                                                                                    buff=0.3)
+        func_eq_final = MathTex(r"F(x) = 0 + 1 x + x (F(x) - 0) + x^2 F(x)", font_size=32).next_to(func_eq_title, DOWN,
+                                                                                                   buff=0.3)
+
+        self.play(Write(func_eq0))
+        self.wait(1)
+        self.play(ReplacementTransform(func_eq0, func_eq))
+        self.wait(1)
+        self.play(ReplacementTransform(func_eq, func_eq1))
+        self.wait(1)
+        self.play(ReplacementTransform(func_eq1, func_eq2))
+        self.wait(1)
+        self.play(ReplacementTransform(func_eq2, func_eq3))
+        self.wait(1)
+        self.play(ReplacementTransform(func_eq3, func_eq_final))
+        self.wait(2)
+
+        # Simplification
+        simplify = MathTex(r"F(x) = x + x F(x) + x^2 F(x)", font_size=32)
+        simplify.next_to(func_eq_final, DOWN, buff=0.5)
+        self.play(Write(simplify))
+        self.wait(1)
+        self.play(simplify.animate.shift(LEFT * 1.8))
+
+        # Solve for F(x)
+        solve = MathTex(r"\quad\Leftrightarrow\quad", r"F(x) (1 - x - x^2) = x", font_size=32,
+                        tex_to_color_map={r"F(x) (1 - x - x^2) = x": YELLOW})
+        solve.next_to(simplify, RIGHT, buff=0.5)
+        self.play(Write(solve))
+        self.wait(1)
+
+        solve2 = MathTex(r"\quad\Leftrightarrow\quad", r"F(x) = \frac{x}{1 - x - x^2}", font_size=32,
+                         tex_to_color_map={r"F(x) = \frac{x}{1 - x - x^2}": YELLOW})
+        solve2.next_to(simplify, RIGHT, buff=0.5)
+        self.play(ReplacementTransform(solve, solve2))
+        self.wait(2)
+
+        self.clear()
+        self.wait(2)
+
+        #funcs
+
+        ffunc = MathTex(r"F(x) = \frac{x}{1-x-x^2}", font_size=32, color=YELLOW
+                        ).align_to(example_title, DOWN).shift(DOWN * 0.5)
+        roots = MathTex(r"\phi = \frac{1 + \sqrt{5}}{2}, \quad \psi = \frac{1 - \sqrt{5}}{2}",
+                        font_size=30, color= WHITE).next_to(ffunc, DOWN, buff=0.4)
+        roots2 = MathTex(r"1-x-x^2 = (1-\phi x)(1-\psi x)",
+                        font_size=30, color=WHITE).next_to(roots, DOWN, buff=0.4)
+        rform = MathTex(r"\frac{x}{1-x-x^2} \,=\, \left(\frac{A}{1-\phi x} + \frac{B}{1-\psi x}\right)",font_size=32
+                        ).next_to(roots, DOWN, buff=0.4)
+
+        xr = MathTex(r"x \equiv A(1 - \psi x)+B(1- \phi x)",font_size=32).next_to(rform, DOWN, buff=-0.1)
+        xr0 = MathTex(r"x \equiv (A + B) + (-A\psi - B\phi)x",font_size=32).next_to(rform, DOWN, buff=-0.1)
+
+        sxr = MathTex(r"\left\{ \begin{aligned}"
+                      r"& A + B = 0 \\" 
+                      r"&-(A\psi + B\phi) = 1"
+                      r"\end {aligned} \right."
+                      r"\quad \Rightarrow \; A = \frac{1}{\sqrt{5}},\, B = \frac{-1}{\sqrt{5}}",font_size=32
+                      ).next_to(xr, DOWN, buff=0.4)
+        self.play(Write(ffunc))
+        self.wait(1)
+        self.play(Write(roots))
+        self.wait(2)
+        self.play(Write(roots2))
+        self.wait(2)
+        self.play(ReplacementTransform(roots2, rform))
+        self.wait(2)
+        self.play(FadeOut(roots),rform.animate.align_to(roots, DOWN).shift(DOWN * 0.4))
+        self.wait(2)
+        self.play(Write(xr))
+        self.wait(1)
+        self.play(ReplacementTransform(xr, xr0))
+        self.wait(2)
+        self.play(Write(sxr))
+        self.wait(2)
+
+        rffunc = MathTex(r"F(x) = \frac{1}{\sqrt{5}}\left[\left(\frac{1}{1-\phi x}\right) "
+                         r"- \left(\frac{1}{1-\psi x}\right)\right]", font_size=32, color=YELLOW
+                        ).align_to(example_title, DOWN).shift(DOWN * 0.5)
+        self.play(ReplacementTransform(ffunc, rffunc))
+        self.wait(2)
+        self.play(FadeOut(xr0), FadeOut(sxr), FadeOut(rform))
+        self.wait(1)
+        ttext = MathTex(r"\frac{1}{1 - \phi x} = \sum_{n=0}^{\infty} (\phi x)^n \, , \, "
+                        r"\quad \frac{1}{1 - \psi x} = \sum_{n=0}^{\infty} (\psi x)^n",
+                        font_size=32).next_to(rffunc, DOWN, buff=0.7)
+        self.play(Write(ttext))
+        self.wait(2)
+        ftext = MathTex(r"F(x)\, = \, \sum_{n=0}^{\infty} \frac{\phi^n - \psi^n}{\sqrt{5}} x^n",
+                        font_size=32).next_to(ttext, DOWN, buff=0.7)
+        self.play(Write(ftext))
+        self.wait(2)
+        self.play(FadeOut(ttext), FadeOut(rffunc))
+        self.wait(1)
+        self.play(ReplacementTransform(
+            ftext, MathTex(r"\frac{1}{\sqrt{5}}\left[\left(\frac{1+\sqrt{5}}{2}\right)^n "
+                                                      r"- \left(\frac{1-\sqrt{5}}{2}\right)^n\right]",
+                                                      font_size=32, color=BLUE), run_time=2))
+        self.wait(2)
+
+class RecurrenceSummary(Scene):
+    def construct(self):
+        title = Text("Recurrence Relations: Summary", font_size=36, color=BLUE)
+        self.play(Write(title))
+        self.play(title.animate.to_edge(UP))
+
+        # Three methods
+        methods_title = Text("Three Solution Methods:", font_size=28, color=YELLOW)
+        methods_title.next_to(title, DOWN, buff=1)
+        self.play(Write(methods_title))
+
+        # Method 1
+        method1 = VGroup(
+            Text("1. Backward Substitution", font_size=24, color=GREEN),
+            Text("   • Simple and intuitive", font_size=20),
+            Text("   • Works for many recurrences", font_size=20),
+            Text("   • Always verify the result", font_size=20)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+        method1.next_to(methods_title, DOWN, buff=0.5)
+
+        # Method 2
+        method2 = VGroup(
+            Text("2. Characteristic Equation", font_size=24, color=GREEN),
+            Text("   • For homogeneous linear recurrences", font_size=20),
+            Text("   • Substitute aₙ = xⁿ", font_size=20),
+            Text("   • Solve polynomial, handle root multiplicities", font_size=20)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+        method2.next_to(method1, DOWN, buff=0.3)
+
+        # Method 3
+        method3 = VGroup(
+            Text("3. Generating Functions", font_size=24, color=GREEN),
+            Text("   • Create power series F(x) = Σaₙxⁿ", font_size=20),
+            Text("   • Form functional equation", font_size=20),
+            Text("   • Solve and expand to find coefficients", font_size=20)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+        method3.next_to(method2, DOWN, buff=0.3)
+
+        self.play(Write(method1))
+        self.wait()
+        self.play(Write(method2))
+        self.wait()
+        self.play(Write(method3))
+        self.wait()
+
+        # Famous sequences
+        famous_title = Text("Famous Sequences from Recurrences:", font_size=24, color=ORANGE)
+        famous_title.next_to(method3, DOWN, buff=0.8)
+        self.play(Write(famous_title))
+
+        sequences = VGroup(
+            Text("• Fibonacci: aₙ = aₙ₋₁ + aₙ₋₂", font_size=20),
+            Text("• Catalan: aₙ = Σaₖaₙ₋₁₋ₖ (parentheses problem)", font_size=20),
+            Text("• Powers of 2: aₙ = 2aₙ₋₁ + 1", font_size=20)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+        sequences.next_to(famous_title, DOWN, buff=0.3)
+
+        self.play(AnimationGroup(*[Write(seq) for seq in sequences], lag_ratio=0.3))
+        self.wait(2)
+# manim -pql recurrence_relations_manim.py RecurrenceSummary
