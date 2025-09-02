@@ -1,0 +1,153 @@
+from manim import *
+import math
+
+class BinetFunctionGraphs(MovingCameraScene):
+    def construct(self):
+        # constants
+        phi = (1 + math.sqrt(5)) / 2
+        psi = (1 - math.sqrt(5)) / 2
+        abs_psi = abs(psi)
+
+        initial_frame = self.camera.frame.copy()
+
+        # exact for integer k
+        def binet_exact(k: int) -> float:
+            return (phi ** k - psi ** k) / math.sqrt(5)
+
+        # real part for continuous x (to visualize oscillation)
+        def binet_realpart(x: float) -> float:
+            return (phi ** x - (abs_psi ** x) * math.cos(math.pi * x)) / math.sqrt(5)
+
+        # imaginary part for continuous x
+        def binet_imaginarypart(x: float) -> float:
+            return (-(abs_psi ** x) * math.sin(math.pi * x)) / math.sqrt(5)
+
+        def binet_imaginarypart2(x: float) -> float:
+            return (-(20 * abs_psi ** x) * math.sin(math.pi * x)) / math.sqrt(5)
+
+        # axes and layout
+        x_min, x_max = 0, 10
+        y_real_max = max(5, math.ceil(max([binet_realpart(x_min + i * (x_max - x_min) / 400) for i in range(401)])) + 2)
+        y_imag_min = min(-5, math.floor(min([binet_imaginarypart(x_min + i * (x_max - x_min) / 400) for i in range(401)])) - 2)
+        y_imag_max = max(5, math.ceil(max([binet_imaginarypart(x_min + i * (x_max - x_min) / 400) for i in range(401)])) + 2)
+
+        # Adjust y_range to accommodate both real and imaginary parts
+        y_min_combined = min(0, y_imag_min)
+        y_max_combined = max(y_real_max, y_imag_max)
+
+        axes = Axes(
+            x_range=[x_min, x_max, 1],
+            y_range=[y_min_combined, y_max_combined, max(1, (y_max_combined - y_min_combined) // 10)],
+            x_length=11,
+            y_length=6,
+            axis_config={"include_ticks": True, "include_tip": False},
+        ).shift(LEFT * 0.5)
+
+        # labels
+        title_real = MathTex(
+            r"y = \frac{1}{\sqrt{5}}\left[\;\left(\frac{1+\sqrt{5}}{2}\right)^x - \left(\frac{1-\sqrt{5}}{2}\right)^x\;\right]",
+            font_size=30).scale(0.8).to_edge(UP).shift(LEFT * 2.5)
+
+        title_imag = MathTex(
+            r"y : \mathbb{R} \to \mathbb{C}",
+            font_size=30, color= YELLOW).scale(1).to_edge(UP).next_to(title_real, RIGHT, buff=0.4)
+
+        tilefn = MathTex(
+            r"F_n = y(x_n) \; | \: x_n \in \mathbb{Z}",
+            font_size=30).next_to(title_real, DOWN, buff=0.4).align_to(title_real, LEFT)
+
+        # Access axis objects safely
+        x_axis_obj = axes.get_x_axis()
+        y_axis_obj = axes.get_y_axis()
+
+        x_label = MathTex(r"x").scale(0.6)
+        x_label.next_to(x_axis_obj.get_right(), DOWN)
+
+        y_label = MathTex(r"y").scale(0.6)
+        y_label.next_to(y_axis_obj.get_top(), LEFT)
+
+        # continuous real-part curve (dashed)
+        real_curve = axes.plot(binet_realpart, x_range=[x_min, x_max], use_smoothing=True, color=RED)
+        dashed_real_curve = DashedVMobject(real_curve, num_dashes=300)
+
+        # continuous imaginary-part curve
+        imag_curve = axes.plot(binet_imaginarypart, x_range=[x_min, x_max], use_smoothing=True, color=BLUE)
+        dashed_imag_curve = DashedVMobject(imag_curve, num_dashes=500)
+
+        imag_curve2 = axes.plot(binet_imaginarypart2, x_range=[x_min, x_max], use_smoothing=True, color=BLUE)
+        dashed_imag_curve2 = DashedVMobject(imag_curve2, num_dashes=500)
+
+        # Prepare discrete integer points and labels
+        integer_points = []
+        integer_labels = []
+        for m in range(x_min, x_max + 1):
+            xn = m
+            yn = binet_exact(m)
+            pt = Dot(axes.coords_to_point(xn, yn), radius=0.05, color=YELLOW)
+            label = MathTex(rf"F_{{{m}}}={int(round(yn))}").scale(0.44) #sorry
+            if m == 0:
+                label.next_to(pt, LEFT, buff=0.12)
+            elif m == 1:
+                label.next_to(pt, DOWN + RIGHT, buff=0.12)
+            elif m == 2:
+                label.next_to(pt, RIGHT + UP, buff=0.12)
+            elif m == 3:
+                label.next_to(pt, DOWN + RIGHT, buff=0.12).shift(DOWN * 0.1)
+            elif m == 4:
+                label.next_to(pt, UP + LEFT, buff=0.12)
+            elif m == 5:
+                label.next_to(pt, DOWN + RIGHT, buff=0.12)
+            elif m == 6:
+                label.next_to(pt, UP + LEFT, buff=0.12)
+            elif m == 7:
+                label.next_to(pt, DOWN + RIGHT, buff=0.12).shift(UP * 0.1)
+            elif m == 8:
+                label.next_to(pt, UP + LEFT, buff=0.12)
+            elif m == 9:
+                label.next_to(pt, DOWN + RIGHT, buff=0.12).shift(UP * 0.1)
+            elif m == 10:
+                label.next_to(pt, UP + RIGHT, buff=0.12)
+            else:
+                label.next_to(pt, DOWN + RIGHT, buff=0.12).shift(DOWN * 0.5)
+            integer_points.append(pt)
+            integer_labels.append(label)
+
+        # group static items for safe animation
+        intro_group = VGroup(x_label, y_label)
+        curve_group = VGroup(dashed_real_curve, dashed_imag_curve)
+
+        # Add axes and intro text
+        self.play(FadeIn(axes), run_time=2)
+        self.play(FadeIn(intro_group), run_time=1.0)
+        self.wait()
+        self.play(FadeIn(title_real))
+        self.wait()
+        self.play(FadeIn(title_imag))
+        self.wait(1)
+
+        # draw the continuous curves
+        self.play(Create(curve_group), run_time=5)
+        self.wait(3)
+        self.play(Transform(dashed_imag_curve, dashed_imag_curve2))
+        self.wait(2)
+        self.play(Write(tilefn))
+        self.wait(2)
+
+        # Animate integer points one-by-one with camera zoom
+        for pt, lbl in zip(integer_points, integer_labels):
+            self.play(self.camera.frame.animate.move_to(pt).set(width=axes.get_width() / 3), run_time=1)
+            self.play(GrowFromCenter(pt), FadeIn(lbl), run_time=1)
+            self.wait(0.5)
+            self.play(self.camera.frame.animate.move_to(pt).set(width=axes.get_width() / 2.5), run_time=1)
+            self.wait(0.08)
+
+        self.play(
+            self.camera.frame.animate.move_to(initial_frame).set(width=axes.get_width() / 0.8), run_time=2)
+        self.wait(5)
+
+        # note
+        note = MathTex(
+            r"\text{The function matches $a_n$!}", color=YELLOW
+        ).scale(0.42).next_to(tilefn, RIGHT, buff=0.3)
+        self.play(FadeIn(note))
+        self.wait(5)
