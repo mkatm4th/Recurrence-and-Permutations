@@ -1,0 +1,584 @@
+from manim import *
+
+class Reflexao2(Scene):
+    def construct(self):
+        # Parâmetros do problema
+        a, b, c = 14, 2, -1
+
+        # Criar os eixos
+        axes = Axes(
+            x_length=10,
+            y_length=5,
+            x_range=[0, 17],
+            y_range=[-6, 10],
+            tips=False,
+            axis_config={"include_numbers": True}
+        )
+
+        # Adicionar eixos
+        grid = NumberPlane(
+            x_range=axes.x_range,
+            y_range=axes.y_range,
+            x_length=axes.x_length,
+            y_length=axes.y_length,
+            background_line_style={
+                "stroke_color": GREY,
+                "stroke_width": 1,
+                "stroke_opacity": 0.3
+            }
+        )
+
+        label_Cy = MathTex("(0,0)", font_size=30).next_to(axes.coords_to_point(0, 0), LEFT)
+
+        self.play(FadeIn(grid), FadeIn(label_Cy))
+
+        self.wait(2)
+
+        #Adiciona cod de (a,b)
+
+        label_Cx = MathTex("(a,b)", font_size=30).next_to(axes.coords_to_point(a, b), RIGHT)
+
+        AB = Dot(point=axes.coords_to_point(a, b), color=RED).set_z_index(7)
+
+        # self.play(Create(Cx), Create(Cy))
+        self.wait(0.2)
+        self.play(FadeIn(AB), Write(label_Cx))
+
+        self.wait(3)
+
+        # 3. Criar caminho original (que toca y=c)
+        pontos_originais = [
+            (0, 0), (1, 1), (2, 2), (3, 3), (4, 2), (5, 3),  # Toca y=c
+            (6, 2), (7, 1), (8, 0), (9,-1), (10,-2), (11,-1), (12,0), (13,1), (14,2)
+        ]
+        coords = [axes.coords_to_point(x, y) for x, y in pontos_originais]
+        caminho = VMobject(color=BLUE).set_points_as_corners(coords).set_z_index(3)
+
+        pontos_caminho2 = [
+            (0, 0), (1, 1), (2, 0), (3, 1), (4, 0), (5, 1), (6, 2), (7, 1), (8, 0), (9, 1), (10, 0), (11, 1), (12, 2), (13, 1), (14, 2)
+        ]
+        coords2 = [axes.coords_to_point(x, y) for x, y in pontos_caminho2]
+        caminho2 = VMobject(color=YELLOW).set_points_as_corners(coords2)
+        self.play(Create(caminho2), run_time=4)
+        self.wait(1)
+        self.play(Create(caminho), run_time=3)
+        self.wait(1)
+
+        pontos_caminho3 = [
+            (0, 0), (1, -1), (2, -2), (3, -1), (4, 0), (5, -1), (6, 0), (7, 1), (8, 2), (9, 1), (10, 2), (11, 1), (12, 2), (13, 3), (14, 2)
+        ]
+        coords3 = [axes.coords_to_point(x, y) for x, y in pontos_caminho3]
+        caminho3 = VMobject(color=PURPLE).set_points_as_corners(coords3).set_z_index(4)
+        self.play(Create(caminho3), run_time=3)
+        self.wait(3)
+
+        cond = MathTex(r"\rightarrow \,(x_u,y_d)", font_size=32).next_to(axes.coords_to_point(9,9), RIGHT).shift(DOWN * 0.16)
+        cond2 = MathTex(
+            r"\rightarrow \; (\,\#U,\;\#D\,)",
+            font_size=32
+        ).next_to(axes.coords_to_point(9,9), RIGHT).shift(DOWN * 0.16)
+
+        tcond = MathTex(r"\rightarrow \; (U\,D\,D\,U\,D\,U\,U\,\cdots)", font_size=32).align_to(cond, LEFT).align_to(cond, DOWN)
+
+        self.play(Write(tcond))
+        self.wait(2)
+        self.play(ReplacementTransform(tcond, cond2))
+        self.wait(1)
+        self.play(ReplacementTransform(cond2, cond))
+
+        scond = MathTex(r"\left\{ \begin{aligned}"
+                        r"&x_u + y_d = a \\"
+                        r"&x_u - y_d = b"
+                        r"\end{aligned} \right.",
+                        r"\Rightarrow\, x_u=\frac{a+b}{2},\, y_d=\frac{a-b}{2}", font_size=32).next_to(cond, DOWN, buff=0.2).shift(RIGHT * 0.4)
+        self.wait(2)
+        self.play(Write(scond[0]))
+        self.wait(2)
+        self.play(scond[0].animate.shift(LEFT * 0.5))
+        self.play(Write(scond[1]))
+        self.wait(2)
+
+        ff0 = MathTex(
+            r"T_{a,b} = ",
+            r"\frac{a!}{(x_u)! \, \cdot \, (y_d)!}"
+        ).scale(0.8).to_edge(DOWN).shift(DOWN * 0.2)
+
+        formula = MathTex(
+            r"T_{a,b} = ",
+            r"\frac{a!}{(\frac{a+b}{2})! (\frac{a-b}{2})!}"
+        ).scale(0.8).to_edge(DOWN).shift(DOWN * 0.2)
+
+        self.play(Write(ff0))
+        self.wait(2)
+        self.play(ReplacementTransform(ff0, formula))
+        self.wait(5)
+        self.play(FadeOut(label_Cy),FadeOut(caminho2),FadeOut(caminho3),FadeOut(cond),FadeOut(scond),FadeOut(formula))
+        self.wait(2)
+
+
+        # Adiciona linha y = c
+        linha_barreira = DashedLine(
+            start=axes.coords_to_point(0, c),
+            end=axes.coords_to_point(9 , c),
+            color=RED,
+            dash_length=0.2
+        )
+        label_barreira = MathTex(r"c:\,", font_size=30).next_to(linha_barreira, LEFT)
+
+
+
+        self.play(Create(linha_barreira), Write(label_barreira))
+
+        # Enfatizar ponto de toque com y=c
+        toque_idx = 9  # posição x onde y=c
+        ponto_toque = Dot(coords[toque_idx], color=YELLOW).set_z_index(20)
+        ponto_toque.set_z_index(10)
+        label_toque = MathTex(r"(y = c)", font_size=30).next_to(ponto_toque, DOWN, buff=0.5)
+        self.play(FadeIn(ponto_toque))
+        self.play(Write(label_toque))
+        self.wait(1)
+
+        # Separar trecho anterior e posterior ao toque
+        anterior = VMobject(color=BLUE).set_points_as_corners(coords[:toque_idx + 1]).set_z_index(8)
+        posterior = VMobject(color=ORANGE).set_points_as_corners(coords[toque_idx:]).set_z_index(8)
+        self.play(Create(anterior), Create(posterior))
+        self.wait(0.5)
+
+        # Refletir parte posterior (após toque)
+        def refletir(ponto):
+            x, y = ponto
+            return x, 2 * c - y
+
+        coords_refletidos = [axes.coords_to_point(*refletir(pontos_originais[i]))
+                             for i in range(toque_idx, len(pontos_originais))]
+        refletido = VMobject(color=GREEN).set_points_as_corners(coords_refletidos).set_z_index(8)
+
+        # Anima transição do posterior para refletido
+        self.play(Transform(posterior, refletido))
+        self.wait(1)
+
+        # Destacar o novo ponto final
+        ponto_final = Dot(coords_refletidos[-1], color=RED).set_z_index(10)
+        label_final = MathTex(f"(a,\,-b+(2c))",font_size=28).next_to(ponto_final, DOWN,buff=0.2).shift(RIGHT * 0.3)
+        self.play(FadeIn(ponto_final), Write(label_final))
+        self.wait(1)
+        self.play(Transform(label_final, MathTex(f"(a,2c-b)",font_size=28).next_to(ponto_final, DOWN,buff=0.2).shift(RIGHT * 0.3)))
+
+
+        self.wait(2)
+        self.play(FadeOut(label_toque))
+        self.wait(1)
+
+        # Second Instance
+
+        self.play(Create(caminho3), run_time=2.5)
+
+        # Enfatizar ponto de toque com y=c
+        toque_idx2 = 1  # posição x onde y=c
+        ponto_toque2 = Dot(coords3[toque_idx2], color=YELLOW).set_z_index(20)
+        ponto_toque2.set_z_index(10)
+        self.play(FadeIn(ponto_toque2))
+        self.wait(1)
+
+        # Separar trecho anterior e posterior ao toque
+        anterior2 = VMobject(color=PURPLE).set_points_as_corners(coords3[:toque_idx2 + 1]).set_z_index(8)
+        posterior2 = VMobject(color=ORANGE).set_points_as_corners(coords3[toque_idx2:]).set_z_index(8)
+        self.play(Create(anterior2), Create(posterior2), run_time=2)
+        self.wait(0.5)
+
+        # Refletir parte posterior (após toque)
+        def refletir2(ponto2):
+            x, y = ponto2
+            return x, 2 * c - y
+
+        coords_refletidos2 = [axes.coords_to_point(*refletir2(pontos_caminho3[i]))
+                             for i in range(toque_idx2, len(pontos_caminho3))]
+        refletido2 = VMobject(color=GREEN).set_points_as_corners(coords_refletidos2).set_z_index(8)
+
+        # Anima transição do posterior para refletido
+        self.play(Transform(posterior2, refletido2))
+        self.wait(3)
+
+        self.play(FadeOut(posterior2),FadeOut(anterior2),FadeOut(ponto_toque2), FadeOut(caminho3))
+
+        self.wait(2)
+
+        formula2 = MathTex(
+            r"T_{a,2c-b} = ",
+            r"\frac{a!}{(\frac{a+2c-b}{2})! (\frac{a-2c+b}{2})!}"
+        ).scale(0.8).align_to(scond, DOWN)
+
+        formula.align_to(scond, DOWN)
+        self.play(Write(formula))
+        self.wait(2)
+        self.play(ReplacementTransform(formula,formula2))
+        self.wait(3)
+        self.play(FadeOut(formula2))
+        self.wait(2)
+
+        # Exibir fórmula de reflexão
+        formula3 = MathTex(
+            "T_{a,b} - T_{a,2c - b} = ",
+            "\\binom{a}{\\frac{a + b}{2}} - \\binom{a}{\\frac{a + 2c - b}{2}}"
+        ).scale(0.7).to_edge(DOWN).shift(DOWN * 0.2)
+        self.play(Write(formula3))
+        self.wait(2)
+
+class PCatalan(Scene):
+    def construct(self):
+
+        title = Tex(
+            r"Let $A_n$ be the number of sequences with $n$ pairs of open and closed parenthesis. \\",
+            r"For a given $n$, how many {valid sequences} of parentheses are there?",
+            font_size=29,
+            color=BLUE,
+            tex_to_color_map={"valid sequences": YELLOW}
+        )
+
+        self.play(Write(title[0]), run_time=1.5)
+        self.wait()
+        tgroup = VGroup(title[1], title[2], title[3])
+        self.play(Write(tgroup), run_time=2)
+        self.wait(2)
+        self.play(title.animate.shift(UP * 1.5))
+
+        title2 = Tex(
+            r"$\Rightarrow$ A {valid parentheses sequence} is one where \\"
+            r"we never close a parenthesis before opening one.",
+            font_size=29,
+            color=BLUE,
+            tex_to_color_map={"valid parentheses sequence": YELLOW}
+        ).next_to(title, DOWN, buff=0.6)
+
+        self.play(Write(title2))
+        self.wait(2)
+        self.play(FadeOut(title))
+        self.wait(1)
+        self.play(title2.animate.to_edge(UP, buff= 0.6), run_time=2)
+        self.wait(2)
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+        # Parâmetros do problema
+        a, b, c = 14, 0, -1
+
+        #  Criar os eixos
+        axes = Axes(
+            x_length=10,
+            y_length=5,
+            x_range=[0, 17],
+            y_range=[-6, 10],
+            tips=False,
+            axis_config={"include_numbers": True}
+        )
+
+        # grade
+        grid = NumberPlane(
+            x_range=axes.x_range,
+            y_range=axes.y_range,
+            x_length=axes.x_length,
+            y_length=axes.y_length,
+            background_line_style={
+                "stroke_color": GREY,
+                "stroke_width": 1,
+                "stroke_opacity": 0.3
+            }
+        )
+        self.play(FadeIn(grid))
+        self.wait(2)
+
+        #TEXT
+
+        cond = MathTex(r"\rightarrow \,(x_o,y_c)", font_size=32).next_to(title2,DOWN, buff=0.4)
+        cond2 = MathTex(
+            r"\rightarrow \; (\,\#O,\;\#C\,)",
+            font_size=32
+        ).next_to(title2,DOWN, buff=0.4)
+
+        tcond = MathTex(r"\rightarrow \; (O\,C\,C\,O\,C\,O\,O\,\cdots)", font_size=32).next_to(title2,DOWN, buff=0.4)
+        self.play(Write(tcond))
+        self.wait(2)
+
+        # Criar caminho original (que toca y=c)
+
+        pontos_originais = [
+            (0, 0), (1, 1), (2, 2), (3, 3), (4, 2), (5, 3),  # Toca y=c
+            (6, 2), (7, 1), (8, 0), (9, -1), (10, -2), (11, -1), (12, 0), (13, 1), (14, 0)
+        ]
+        coords = [axes.coords_to_point(x, y) for x, y in pontos_originais]
+        caminho = VMobject(color=BLUE).set_points_as_corners(coords)
+        self.play(Create(caminho), run_time=3)
+        self.wait(2)
+
+        #Textdev
+
+        self.play(ReplacementTransform(tcond, cond2))
+        self.wait(1)
+        self.play(ReplacementTransform(cond2, cond))
+
+        scond = MathTex(r"\left\{ \begin{aligned}"
+                        r"&x_o + y_c = 2n \\"
+                        r"&x_o - y_c = 0"
+                        r"\end{aligned} \right.",
+                        r"\Rightarrow\, x_u = n,\, y_d = n", font_size=32
+                        ).next_to(cond, DOWN, buff=0.2).shift(RIGHT * 0.4)
+        self.wait(2)
+        self.play(Write(scond[0]))
+        self.wait(2)
+        self.play(scond[0].animate.shift(LEFT * 0.5))
+        self.play(Write(scond[1].shift(LEFT * 0.5)))
+        self.wait(3)
+        self.play(cond.animate.shift(LEFT * 0.5))
+        self.play(Write(MathTex(r"n = 7", font_size=32, color=GREEN).next_to(cond, RIGHT).shift(LEFT * 0.05)))
+        self.play(Transform(scond, MathTex(r"\left\{ \begin{aligned}"
+                        r"&x_o + y_c = 14 \\"
+                        r"&x_o - y_c = 0"
+                        r"\end{aligned} \right.",
+                        r"\Rightarrow\, x_u = 7,\, y_d = 7", font_size=32
+                        ).next_to(cond, DOWN, buff=0.2).shift(RIGHT * 0.4)))
+        self.wait(3)
+
+        # Adiciona cod de (a,b)
+
+        Cy = DashedLine(
+            start=axes.coords_to_point(0, b),
+            end=axes.coords_to_point(a, b),
+            color=WHITE,
+            dash_length=0.2
+        )
+        label_Cy = MathTex("", font_size=35).next_to(Cy, LEFT)
+
+        Cx = DashedLine(
+            start=axes.coords_to_point(a, 0),
+            end=axes.coords_to_point(a, b),
+            color=WHITE,
+            dash_length=0.2
+        )
+        label_Cx = MathTex("(14,0)", font_size=30).next_to(Cx, DOWN, buff=0.1)
+
+        AB = Dot(point=axes.coords_to_point(a, b), color=PURPLE)
+
+        self.play(Create(Cx), Create(Cy))
+        self.wait(0.2)
+        self.play(FadeIn(AB), Write(label_Cy), Write(label_Cx))
+
+        # Adiciona linha de barreira y = c
+        linha_barreira = DashedLine(
+            start=axes.coords_to_point(0, c),
+            end=axes.coords_to_point(9, c),
+            color=RED,
+            dash_length=0.2
+        )
+        label_barreira = MathTex("-1", font_size=35).next_to(linha_barreira, LEFT)
+        self.play(Create(linha_barreira), Write(label_barreira))
+
+        # Enfatizar ponto de toque com y=c
+        toque_idx = 9  # posição x onde y=c
+        ponto_toque = Dot(coords[toque_idx], color=YELLOW)
+        ponto_toque.set_z_index(1)
+        #label_toque = Text("(y = c)", font_size=25).next_to(ponto_toque, DOWN, buff=0.5)
+        self.play(FadeIn(ponto_toque))
+        # self.play(Write(label_toque))
+        self.wait(1)
+
+        # Separar trecho anterior e posterior ao toque
+        anterior = VMobject(color=BLUE).set_points_as_corners(coords[:toque_idx + 1])
+        posterior = VMobject(color=ORANGE).set_points_as_corners(coords[toque_idx:])
+        self.play(Create(anterior), Create(posterior))
+        self.wait(0.5)
+
+        # Refletir parte posterior (após toque)
+        def refletir(ponto):
+            x, y = ponto
+            return x, 2 * c - y
+
+        coords_refletidos = [axes.coords_to_point(*refletir(pontos_originais[i]))
+                             for i in range(toque_idx, len(pontos_originais))]
+        refletido = VMobject(color=GREEN).set_points_as_corners(coords_refletidos)
+
+        # Anima transição do posterior para refletido
+        self.play(Transform(posterior, refletido))
+        self.wait(1)
+
+        # Destacar o novo ponto final
+        ponto_final = Dot(coords_refletidos[-1], color=PURPLE)
+        label_final = MathTex(f"(14,-2)", font_size=28).next_to(ponto_final, DOWN, buff=0.2)
+        self.play(FadeIn(ponto_final), Write(label_final))
+        self.wait(1)
+
+        # Exibir fórmula de reflexão
+        formula = MathTex(
+            "T_{a,b} - T_{a,2c - b} = ",
+            "\\binom{a}{\\frac{a + b}{2}} - \\binom{a}{\\frac{a + 2c - b}{2}}"
+        ).scale(0.7).to_edge(DOWN).shift(DOWN * 0.2)
+        self.play(Write(formula))
+        self.wait(2)
+
+        # Exibir fórmula de reflexão
+        fonl = MathTex(
+            "T_{(14,0)} - T_{(14,-2)} = ",
+            "\\binom{14}{7} - \\binom{14}{6}"
+        ).scale(0.7).to_edge(DOWN).shift(DOWN * 0.2)
+        self.play(Transform(formula, fonl))
+        self.wait(2)
+
+        fonl2 = MathTex("\\binom{14}{7}"," - ","\\binom{14}{6}").scale(0.7).to_edge(DOWN).shift(DOWN * 0.2)
+        self.play(ReplacementTransform(formula, fonl2))
+
+#-----------------------------------------------------------------------------------------------------------------------
+        # Show binomial coefficient
+        binom = MathTex(r"\binom{14}{6}").scale(0.7).to_edge(DOWN).shift(DOWN * 0.2).align_to(fonl2,RIGHT)
+        self.play(FadeIn(binom))
+        binom2 = MathTex(r"\binom{14}{7}").scale(0.7).to_edge(DOWN).shift(DOWN * 0.2).align_to(fonl2, LEFT)
+        self.play(FadeIn(binom2))
+
+        self.play(FadeOut(fonl2))
+        self.wait(1)
+
+        # Transform to factorial form
+        factorial = MathTex(r"\frac{14!}{6! \cdot 8!}").scale(0.7).move_to(binom.get_center()).next_to(fonl2[1], RIGHT)
+        factorial2 = MathTex(r"\frac{14!}{7! \cdot 7!}").scale(0.7).move_to(binom.get_center()).next_to(fonl2[1], LEFT)
+        self.play(ReplacementTransform(binom, factorial),
+                  ReplacementTransform(binom2, factorial2))
+        self.wait(1)
+
+        num_factors = ["14", "13", "12", "11", "10", "9", "8", "7", "6!"]
+        den_expanded = ["8", "7", "6", "5", "4", "3", "2", "1"]
+
+        num_factors2 = ["14", "13", "12", "11", "10", "9", "8", "7!"]
+        den_expanded2 = ["7", "6", "5", "4", "3", "2", "1"]
+
+        # Build MathTex with isolated substrings
+        num_tex = MathTex(" \\cdot ".join(num_factors), substrings_to_isolate=num_factors).scale(0.7)
+
+        den_expanded_tex = MathTex(" \\cdot ".join(den_expanded), substrings_to_isolate=den_expanded)
+
+        den_static_tex = MathTex("6!", substrings_to_isolate=["6!"])
+
+        dot_between = MathTex(r"\cdot")
+
+        #2
+
+        num_tex2 = MathTex(" \\cdot ".join(num_factors2), substrings_to_isolate=num_factors2).scale(0.7)
+
+        den_expanded_tex2 = MathTex(" \\cdot ".join(den_expanded2), substrings_to_isolate=den_expanded2)
+
+        den_static_tex2 = MathTex("7!", substrings_to_isolate=["7!"])
+
+        dot_between2 = MathTex(r"\cdot")
+
+        # Build fraction layout
+        den_group = VGroup(den_expanded_tex, dot_between, den_static_tex).arrange(RIGHT, buff=0.3).scale(0.7)
+
+        # Create the fraction line based on the width of the numerator and denominator
+        line_width = max(num_tex.width, den_group.width) * 1.1
+        fraction_line = Line(LEFT * line_width / 2, RIGHT * line_width / 2)
+
+        full_fraction = VGroup(num_tex, fraction_line, den_group).arrange(DOWN, buff=0.3)
+        full_fraction.scale(0.7).move_to(binom.get_center()).align_to(factorial, LEFT)
+
+
+        # Build fraction layout 2
+        den_group2 = VGroup(den_expanded_tex2, dot_between2, den_static_tex2).arrange(RIGHT, buff=0.3).scale(0.7)
+
+        # Create the fraction line based on the width of the numerator and denominator
+        line_width2 = max(num_tex2.width, den_group2.width) * 1.1
+        fraction_line2 = Line(RIGHT * line_width2 / 2, LEFT * line_width2 / 2)
+
+        full_fraction2 = VGroup(num_tex2, fraction_line2, den_group2).arrange(DOWN, buff=0.3)
+        full_fraction2.scale(0.7).move_to(binom2.get_center()).align_to(factorial2, RIGHT)
+
+        self.play(ReplacementTransform(factorial, full_fraction),
+                  ReplacementTransform(factorial2, full_fraction2))
+        self.wait(1)
+
+
+        # Highlight and cancel the 6! terms
+        highlight_color = YELLOW
+        cancel_color = RED
+
+        current_num_tex = full_fraction.submobjects[0]  # This is num_tex after transformation
+        current_den_group = full_fraction.submobjects[2]  # This is den_group after transformation
+        current_den_static_tex = current_den_group.submobjects[2]  # This is den_static_tex within den_group
+
+        num_six_factorial = [m for m in current_num_tex if m.tex_string == "6!"]
+        den_six_factorial = [m for m in current_den_static_tex if m.tex_string == "6!"]
+
+        for m in num_six_factorial + den_six_factorial:
+            m.set_color(highlight_color)
+
+
+        # Highlight and cancel the 7! terms
+
+        highlight_color2 = YELLOW
+
+        current_num_tex2 = full_fraction2.submobjects[0]  # This is num_tex after transformation
+        current_den_group2 = full_fraction2.submobjects[2]  # This is den_group after transformation
+        current_den_static_tex2 = current_den_group2.submobjects[2]  # This is den_static_tex within den_group
+
+        num_six_factorial2 = [m for m in current_num_tex2 if m.tex_string == "7!"]
+        den_six_factorial2 = [m for m in current_den_static_tex2 if m.tex_string == "7!"]
+
+        for m in num_six_factorial2 + den_six_factorial2:
+            m.set_color(highlight_color2)
+
+        self.play(
+            *[Indicate(m) for m in num_six_factorial],
+            *[Indicate(m) for m in den_six_factorial],
+            *[Indicate(m) for m in num_six_factorial2],
+            *[Indicate(m) for m in den_six_factorial2]
+        )
+        self.wait(0.5)
+
+        # Draw crosses
+        crosses = VGroup()
+        for m in num_six_factorial + den_six_factorial:
+            crosses.add(Cross(m, color=cancel_color))
+
+        # Draw crosses 2
+        crosses2 = VGroup()
+        for m in num_six_factorial2 + den_six_factorial2:
+            crosses2.add(Cross(m, color=cancel_color))
+
+        self.play(Create(crosses2), Create(crosses))
+        self.wait(1)
+
+        # Show simplified fraction
+        simplified = MathTex(
+            r"\frac{14 \cdot 13 \cdot 12 \cdot 11 \cdot 10 \cdot 9 \cdot 8 \cdot 7}{8 \cdot 7 \cdot 6 \cdot 5 \cdot 4 \cdot 3 \cdot 2 \cdot 1}"
+        ).scale(0.5).move_to(full_fraction.get_center()).align_to(factorial, LEFT)
+
+        group_to_transform = VGroup(full_fraction, crosses)
+
+        # Show simplified fraction 2
+
+        simplified2 = MathTex(
+            r"\frac{14 \cdot 13 \cdot 12 \cdot 11 \cdot 10 \cdot 9 \cdot 8}{7 \cdot 6 \cdot 5 \cdot 4 \cdot 3 \cdot 2 \cdot 1}"
+        ).scale(0.5).move_to(full_fraction2.get_center()).align_to(factorial2, LEFT)
+
+        group_to_transform2 = VGroup(full_fraction2, crosses2)
+
+        self.play(ReplacementTransform(group_to_transform2, simplified2),
+                  ReplacementTransform(group_to_transform, simplified))
+        self.wait(2)
+
+        #  Final numeric result
+        result = MathTex("3003").scale(0.7).set_color(GREEN).move_to(simplified.get_center())
+
+        #  Final numeric result
+        result2 = MathTex("3432").scale(0.7).set_color(GREEN).move_to(simplified2.get_center()).shift(RIGHT * 0.4)
+        self.play(ReplacementTransform(simplified2, result2),
+                  ReplacementTransform(simplified, result))
+        self.wait(2)
+
+        self.play(FadeIn(fonl2[1].set_color(GREEN)))
+        self.wait(0.5)
+        self.play(result.animate.next_to(fonl2[1], RIGHT), result2.animate.next_to(fonl2[1],LEFT), run_time=1.5)
+        tragp = VGroup(result, result2, fonl2[1])
+        self.wait(1)
+        catalan7 = MathTex(r"429",color= GREEN).scale(0.7).align_to(result, DOWN)
+        self.play(ReplacementTransform(tragp, catalan7))
+        self.wait(1)
+        self.play(catalan7.animate.shift(RIGHT * 0.5))
+        self.play(Write(MathTex(r"A_7\,=", color=GREEN).scale(0.7).next_to(catalan7, LEFT)))
+        self.wait(2)
