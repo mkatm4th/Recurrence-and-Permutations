@@ -1,0 +1,152 @@
+import random
+
+from manim import *
+
+BLACK_SOLID = DARK_BROWN
+BLACK_DASH = GREEN_E
+GRAY_DASH = GREEN_B
+
+class BranchSpec:
+    def __init__(self, bid:int, age:int, parent:int|None, side:str|None):
+        self.bid = bid
+        self.age = age
+        self.parent = parent
+        self.side = side
+
+class TreeGrowthAnimation(MovingCameraScene):
+    def trunk_path(self):
+        start = DOWN*2
+        end = UP*2
+        return Line(start, end)
+
+    def lateral_path(self, start: np.ndarray, side: str, scale: float = 1.0) -> VMobject:
+        # branch curves
+        sx = 1.5 * scale
+        sy = 1.7 * scale
+        dx = RIGHT if side == 'right' else LEFT
+        p0 = start
+        c1 = p0 + dx*1.1*sx + UP*0.01*sy # lateral shift scaling
+        c2 = p0 + dx*0.7*sx + UP*0.85*sy # upper curve shift
+        p3 = p0 + dx*1.05*sx + UP*1.20*sy # smoothing
+        return CubicBezier(p0, c1, c2, p3)
+
+    def style_by_age(self, mobj: VMobject, age: int, width: float = 4) -> VMobject:
+        if age == 0:
+            dashed = DashedVMobject(mobj, num_dashes=22, dashed_ratio=0.5)
+            dashed.set_color(GRAY_DASH).set_stroke(width=width)
+            return dashed
+        if age == 1:
+            dashed = DashedVMobject(mobj, num_dashes=22, dashed_ratio=0.5)
+            dashed.set_color(BLACK_DASH).set_stroke(width=width)
+            return dashed
+        solid = mobj.copy().set_color(BLACK_SOLID).set_stroke(width=width)
+        return solid
+
+    def fit_camera_to(self, mob: Mobject, margin: float = 1.12, run_time: float = 0.6):
+        frame = self.camera.frame
+        gw, gh = mob.width, mob.height
+        if gw <= 0 or gh <= 0:
+            return
+        frame_aspect = frame.width / frame.height
+        obj_aspect = gw / gh
+        if obj_aspect >= frame_aspect:
+            anim = frame.animate.set(width=gw * margin)
+        else:
+            anim = frame.animate.set(height=gh * margin)
+        self.play(anim.move_to(mob.get_center()), run_time=run_time)
+
+    def construct(self):
+        self.camera.background_color = BLACK
+
+        # Estados até t = 8
+        states: list[list[BranchSpec]] = [
+            [BranchSpec(1, 0, None, None)],
+            [BranchSpec(1, 1, None, None)],
+            [BranchSpec(1, 2, None, None), BranchSpec(2, 0, 1, 'right')],
+            [BranchSpec(1, 3, None, None), BranchSpec(2, 1, 1, 'right'), BranchSpec(3, 0, 1, 'left')],
+            [BranchSpec(1, 4, None, None), BranchSpec(2, 2, 1, 'right'), BranchSpec(3, 1, 1, 'left'),
+             BranchSpec(4, 0, 2, 'right'), BranchSpec(5, 0, 2, 'left')],
+            [BranchSpec(1, 5, None, None), BranchSpec(2, 3, 1, 'right'), BranchSpec(3, 2, 1, 'left'),
+             BranchSpec(4, 1, 2, 'right'), BranchSpec(5, 1, 2, 'left'),
+             BranchSpec(6, 0, 3, 'right'), BranchSpec(7, 0, 3, 'left'), BranchSpec(8, 0, 4, 'right')],
+            [BranchSpec(1, 6, None, None), BranchSpec(2, 4, 1, 'right'), BranchSpec(3, 3, 1, 'left'),
+             BranchSpec(4, 2, 2, 'right'), BranchSpec(5, 2, 2, 'left'), BranchSpec(6, 1, 3, 'right'),
+             BranchSpec(7, 1, 3, 'left'), BranchSpec(8, 1, 4, 'right'), BranchSpec(9, 0, 4, 'left'),
+             BranchSpec(10, 0, 5, 'right'), BranchSpec(11, 0, 5, 'left'), BranchSpec(12, 0, 6, 'right'),
+             BranchSpec(13, 0, 6, 'left')],
+            [BranchSpec(1, 7, None, None), BranchSpec(2, 5, 1, 'right'), BranchSpec(3, 4, 1, 'left'),
+             BranchSpec(4, 3, 2, 'right'), BranchSpec(5, 3, 2, 'left'), BranchSpec(6, 2, 3, 'right'),
+             BranchSpec(7, 2, 3, 'left'), BranchSpec(8, 2, 4, 'right'), BranchSpec(9, 1, 4, 'left'),
+             BranchSpec(10, 1, 5, 'right'), BranchSpec(11, 1, 5, 'left'), BranchSpec(12, 1, 6, 'right'),
+             BranchSpec(13, 1, 6, 'left'), BranchSpec(14, 0, 7, 'right'), BranchSpec(15, 0, 7, 'left'),
+             BranchSpec(16, 0, 8, 'right'), BranchSpec(17, 0, 8, 'left'), BranchSpec(18, 0, 9, 'right'),
+             BranchSpec(19, 0, 9, 'left'), BranchSpec(20, 0, 10, 'right'), BranchSpec(21, 0, 10, 'left')],
+            [BranchSpec(1, 8, None, None), BranchSpec(2, 6, 1, 'right'), BranchSpec(3, 5, 1, 'left'),
+             BranchSpec(4, 4, 2, 'right'), BranchSpec(5, 4, 2, 'left'), BranchSpec(6, 3, 3, 'right'),
+             BranchSpec(7, 3, 3, 'left'), BranchSpec(8, 3, 4, 'right'), BranchSpec(9, 2, 4, 'left'),
+             BranchSpec(10, 2, 5, 'right'), BranchSpec(11, 2, 5, 'left'), BranchSpec(12, 2, 6, 'right'),
+             BranchSpec(13, 2, 6, 'left'), BranchSpec(14, 1, 7, 'right'), BranchSpec(15, 1, 7, 'left'),
+             BranchSpec(16, 1, 8, 'right'), BranchSpec(17, 1, 8, 'left'), BranchSpec(18, 1, 9, 'right'),
+             BranchSpec(19, 1, 9, 'left'), BranchSpec(20, 1, 10, 'right'), BranchSpec(21, 1, 10, 'left'),
+             BranchSpec(22, 0, 11, 'right'), BranchSpec(23, 0, 11, 'left'), BranchSpec(24, 0, 12, 'right'),
+             BranchSpec(25, 0, 12, 'left'), BranchSpec(26, 0, 13, 'right'), BranchSpec(27, 0, 13, 'left'),
+             BranchSpec(28, 0, 14, 'right'), BranchSpec(29, 0, 14, 'left'), BranchSpec(30, 0, 15, 'right'),
+             BranchSpec(31, 0, 15, 'left'), BranchSpec(32, 0, 16, 'right'), BranchSpec(33, 0, 16, 'left'),
+             BranchSpec(34, 0, 17, 'right')],
+        ]
+
+        prev_group: VGroup | None = None
+
+        for t, specs in enumerate(states):
+            id_to_path: dict[int, VMobject] = {}
+            id_to_display: dict[int, VMobject] = {}
+
+            trunk = self.trunk_path().set_stroke(width=4)
+            id_to_path[1] = trunk
+            id_to_display[1] = self.style_by_age(trunk, next(s.age for s in specs if s.bid == 1))
+
+            def start_on_trunk(trunk_path: Line, side: str) -> np.ndarray:
+                prop = 0.28 if side == 'right' else 0.55
+                return trunk_path.point_from_proportion(prop)
+
+            for sp in specs:
+                if sp.bid == 1:
+                    continue
+                parent_path = id_to_path[sp.parent]
+                if sp.parent == 1:
+                    start = start_on_trunk(parent_path, sp.side)
+                else:
+                    start = parent_path.point_from_proportion(random.uniform(0.7, 0.9)) # extrema ratio interval
+
+                depth = 1
+                p = sp.parent
+                while True:
+                    parent_spec = next(s for s in specs if s.bid == p)
+                    if parent_spec.parent is None:
+                        break
+                    depth += 1
+                    p = parent_spec.parent
+                scale = max(0.9**(depth-1), 0.65)
+
+                base_path = self.lateral_path(start, sp.side, scale=scale)
+                disp = self.style_by_age(base_path, sp.age)
+                id_to_path[sp.bid] = base_path
+                id_to_display[sp.bid] = disp
+
+            all_disp = VGroup(*id_to_display.values())
+            shift_y = (DOWN*2 - id_to_path[1].get_start())[1]
+            all_disp.shift(UP*shift_y)
+
+            current_group = VGroup(all_disp)
+
+            # Camera: ajustar sempre para caber o grupo atual
+            self.fit_camera_to(current_group, margin=1.12, run_time=1.5)
+
+            if prev_group is None:
+                self.play(Create(all_disp), run_time=1.4)
+            else:
+                self.play(TransformMatchingShapes(prev_group, current_group), run_time=1.2)
+            prev_group = current_group
+            self.wait(0.25)
+
+        self.wait(1)
