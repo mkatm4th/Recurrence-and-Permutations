@@ -1,0 +1,37 @@
+from manim import *
+
+class AndreMethod(Scene):
+    def construct(self):
+
+        #1 First Tile
+        ff = Dot(radius=0.2, color=BLACK).to_edge(UL, buff=0.8)
+        tt = Text("Counting", font_size=40).scale(1.5).next_to(ff, RIGHT, buff=0.5)
+        #self.play(Write(tt))
+        #self.wait(1)
+
+        #2 Sub-tiles
+
+        dt = Dot(radius=0.05, color=WHITE).next_to(ff, DOWN, buff=1.2)
+        dt2 = Dot(radius=0.05, color=WHITE).next_to(dt, DOWN, buff=0.8)
+        dt3 = Dot(radius=0.05, color=WHITE).next_to(dt2, DOWN, buff=0.8)
+        dt4 = Dot(radius=0.05, color=WHITE).next_to(dt3, DOWN, buff=0.8)
+        dt5 = Dot(radius=0.05, color=WHITE).next_to(dt4, DOWN, buff=0.8)
+        dt6 = Dot(radius=0.05, color=WHITE).next_to(dt5, DOWN, buff=0.8)
+
+        st2= Text("Kaplansky's Lemmas",font_size=20).scale(1.5).next_to(dt2, RIGHT)
+        st1= Text("Inclusion and Exclusion Principle",font_size=20).scale(1.5).next_to(dt, RIGHT)
+        st3= Text("Recurrence Formulas",font_size=20).scale(1.5).next_to(dt3, RIGHT)
+        st4= Text("André's Method",font_size=20).scale(1.5).next_to(dt4, RIGHT)
+        st5= Text("Integer Partitions",font_size=20).scale(1.5).next_to(dt5, RIGHT)
+        st6= Text("Action Groups and Burnside's Lemma",font_size=20).scale(1.5).next_to(dt6, RIGHT)
+
+        st21 = Text("André's Method", font_size=30).scale(1.5)
+        self.play(Write(st21))
+
+        #Coloring
+
+        st41 = Text("André's Method", font_size=20, color= YELLOW).scale(1.5).next_to(dt4, RIGHT)
+        st51 = Text("Integer Partitions", font_size=20, color=YELLOW).scale(1.5).next_to(dt5, RIGHT)
+        st61 = Text("Action Groups and Burnside's Lemma", font_size=20, color= YELLOW).scale(1.5).next_to(dt6, RIGHT)
+        #self.play(Transform(st4, st41),Transform(st5, st51),Transform(st6, st61))
+        self.wait(3)
