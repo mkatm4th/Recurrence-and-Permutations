@@ -1,0 +1,626 @@
+from manim import *
+
+config.background_color = BLACK
+
+class KaplanskyLemmasScene(Scene):
+    def construct(self):
+        # Scene 1: Title
+        title = MathTex(r"\text{Kaplansky's Lemmas}", font_size=64, color=WHITE)
+        subtitle = MathTex(r"No-Adjacency\;Combinatorics", font_size=36, color=YELLOW_C)
+        subtitle.next_to(title, DOWN, buff=0.5)
+        self.play(Write(title))
+        self.play(FadeIn(subtitle, shift=DOWN))
+        self.wait(1)
+        self.clear()
+
+        SetS = MathTex(r"S",r"\,=\,\{1,\,2,\,3,\,4,\,5,\cdots,N\}").shift(UP * 1.2)
+        SetS[0].set_color(BLUE)
+        SubS = MathTex(r"S_p\, \subseteq \,S\; \mid \ \;|S_p| = p").next_to(SetS, DOWN, buff=0.8)
+        Stex = MathTex(r"\text{For a given p, what is the total number of sets}",r" \;S_p \\ \text{in which none of the elements are consecutive?}").next_to(SubS, DOWN, buff=0.5)
+        self.play(Write(SetS))
+        self.wait(1)
+        self.play(FadeIn(SubS))
+        self.wait(1)
+        self.play(FadeIn(Stex),run_time=2)
+        self.wait(2)
+        self.play(FadeOut(SubS),FadeOut(Stex),FadeOut(SetS))
+        self.clear()
+
+        # Scene 2: Binary Mapping
+        S_text = MathTex(r"S\,",r"=\{",r"1",r",",r"2",r",",r"3",r",",r"4",r",",r"5",r",",r"6",r",",r"7",r",",r"8",r"\}", font_size=36).scale(1.2)
+        S_text[0].set_color(BLUE)
+        binary = MathTex(r"S_p",r"=\{",r"1",r",",r"0",r",",r"0",r",",r"1",r",",r"0",r",",r"0",r",",r"1",r",",r"0",r"\}", font_size=36).scale(1.2)
+        # 3 9 15
+        binary[0].set_color(YELLOW)
+        subset = MathTex(r"\{1,4,7\}", font_size=36, color=YELLOW_C).scale(1.2)
+        S_text.shift(UP * 1.2)
+        binary.next_to(S_text, DOWN, buff=0.8)
+        subset.next_to(binary, DOWN, buff=0.8)
+        arrow = Arrow(start=binary.get_bottom(), end=subset.get_top(), buff=0.1, color=BLUE)
+
+        S_text1 = MathTex(r"S\,", r"=\{",r"1",r",",r"2",r",",r"3",r",",r"4",r",",r"5",r",",r"6",r",",r"7",r",",r"8",r"\}", font_size=36).scale(1.2)
+        S_text1[0].set_color(BLUE)
+        binary1 = MathTex(r"S_p", r"=\{",r"1",r",",r"1",r",",r"0",r",",r"1",r",",r"1",r",",r"0",r",",r"0",r",",r"0",r"\}", font_size=36).scale(1.2)
+        #3 5 9 11
+        binary1[0].set_color(YELLOW)
+        subset1 = MathTex(r"\{1,2,4,5\}", font_size=36, color=YELLOW_C).scale(1.2)
+        S_text1.shift(UP * 1.2)
+        binary1.next_to(S_text, DOWN, buff=0.8)
+        subset1.next_to(binary, DOWN, buff=0.8)
+        arrow1 = Arrow(start=binary1.get_bottom(), end=subset1.get_top(), buff=0.1, color=BLUE)
+
+        S_text2 = MathTex(r"S\,", r"=\{",r"1",r",",r"2",r",",r"3",r",",r"4",r",",r"5",r",",r"6",r",",r"7",r",",r"8",r"\}", font_size=36).scale(1.2)
+        S_text2[0].set_color(BLUE)
+        binary2 = MathTex(r"S_p", r"=\{",r"1",r",",r"0",r",",r"0",r",",r"1",r",",r"1",r",",r"1",r",",r"1",r",",r"0",r"\}", font_size=36).scale(1.2)
+        #3 9 11 13 15
+        binary2[0].set_color(YELLOW)
+        subset2 = MathTex(r"\{1,4,5,6,7\}", font_size=36, color=YELLOW_C).scale(1.2)
+        S_text2.shift(UP * 1.2)
+        binary2.next_to(S_text, DOWN, buff=0.8)
+        subset2.next_to(binary, DOWN, buff=0.8)
+        arrow2 = Arrow(start=binary2.get_bottom(), end=subset2.get_top(), buff=0.1, color=BLUE)
+
+        self.play(Write(S_text))
+        self.play(FadeIn(binary, shift=DOWN))
+        self.play(Create(arrow))
+        self.play(FadeIn(subset, shift=DOWN))
+        self.wait(1)
+
+        Sgp = VGroup(S_text, binary, subset, arrow)
+        Sgp1 = VGroup(S_text1, binary1, subset1, arrow1)
+        Sgp2 = VGroup(S_text2, binary2, subset2, arrow2)
+
+        self.play(Sgp.animate.shift(LEFT * 4.7).scale(1))
+        self.play(ScaleInPlace(Sgp,0.8))
+        #self.play(FadeOut(Sgp))
+        self.wait(0.5)
+
+        self.play(Write(S_text1))
+        self.play(FadeIn(binary1, shift=DOWN))
+        self.play(Create(arrow1))
+        self.play(FadeIn(subset1, shift=DOWN))
+        self.wait(1)
+
+        self.play(Sgp1.animate.shift(RIGHT * 4.7))
+        self.play(ScaleInPlace(Sgp1,0.8))
+        #self.play(FadeOut(Sgp1))
+        self.wait(0.5)
+
+        self.play(Write(S_text2))
+        self.play(FadeIn(binary2, shift=DOWN))
+        self.play(Create(arrow2))
+        self.play(FadeIn(subset2, shift=DOWN))
+        self.wait(1)
+        self.play(ScaleInPlace(Sgp2,0.8))
+        self.wait(1)
+        #self.play(FadeIn(Sgp,Sgp1))
+        self.wait(2)
+
+        self.play(S_text[2].animate.set_color(RED), S_text[8].animate.set_color(RED), S_text[14].animate.set_color(RED))
+        self.play(binary[2].animate.set_color(RED), binary[8].animate.set_color(RED), binary[14].animate.set_color(RED))
+
+        self.play(S_text2[2].animate.set_color(RED), S_text2[8].animate.set_color(RED),
+                  S_text2[10].animate.set_color(RED), S_text2[12].animate.set_color(RED),
+                  S_text2[14].animate.set_color(RED))
+        self.play(binary2[2].animate.set_color(RED), binary2[8].animate.set_color(RED),
+                  binary2[10].animate.set_color(RED), binary2[12].animate.set_color(RED),
+                  binary2[14].animate.set_color(RED))
+
+        self.play(S_text1[14].animate.set_color(RED), S_text1[2].animate.set_color(RED),
+                  S_text1[8].animate.set_color(RED), S_text1[4].animate.set_color(RED))
+        self.play(binary1[14].animate.set_color(RED), binary1[2].animate.set_color(RED), binary1[8].animate.set_color(RED), binary1[4].animate.set_color(RED))
+
+        self.wait(2)
+
+        self.clear()
+
+        # Int2
+
+        S1 = MathTex("|S|=8")
+        S2 = MathTex("S=",r"\{",r"1",r",",r"2",r",",r"3",r",",r"4",r",",r"5",r",",r"6",r",",r"7",r",",r"8",r"\}")
+
+        self.play(Write(S1))
+        self.wait(1)
+        self.play(Transform(S1, S2))
+        self.wait(2)
+        self.play(S1.animate.shift(UP * 0.8))
+
+        p3 = MathTex("p = 3").next_to(S1, DOWN, buff=0.5)
+        self.play(FadeIn(p3))
+        self.wait(2)
+
+        self.play(S1.animate.shift(LEFT * 0.5),FadeOut(S1[0]), p3.animate.shift(LEFT * 0.1))
+        self.wait(2)
+
+        # Scene 3: Counting Valid Subsets
+        N = 8; p = 3
+        circles = VGroup(*[Dot() for _ in range(N)]).shift(DOWN * 2)
+        circles.arrange(RIGHT, buff=1)
+        labels = VGroup(*[MathTex(str(i+1), font_size= 35) for i in range(N)])
+        for i in range(N):
+            labels[i].scale(0.8).next_to(circles[i], DOWN, buff=0.3)
+
+        dotgroup = VGroup(circles, labels)
+
+        # Equally spaced horizontal lines above the dots
+        line_spacing = 0.3  # vertical space between lines
+        base_height = 1.0  # how far above the dots the lowest line starts
+
+        num_lines = 8  # how many lines you want
+        line_length = 0.9
+        line_y = 0.4  # vertical position above dots
+        line_spacing = 1.1  # horizontal spacing between lines
+
+        olbl = VGroup(*[
+            Line(LEFT * line_length / 2, RIGHT * line_length / 2)
+                      .shift(RIGHT * (i - (num_lines - 1) / 2) * line_spacing + UP * line_y)
+            for i in range(num_lines)
+        ])
+
+        S1.remove(S1[0])
+        self.play(FadeOut(p3))
+        self.play(Transform(S1, dotgroup))
+
+        self.wait(2)
+        self.play(FadeIn(olbl))
+        self.wait(2)
+
+        # Define initial numbers
+        initial_numbers = [1, 0, 0, 1, 0, 1, 0, 0]
+        gn1 = VGroup(*[
+            MathTex(str(num)).next_to(olbl[i], UP)
+            for i, num in enumerate(initial_numbers)
+        ])
+
+        # Show initial numbers
+        self.play(Write(gn1))
+        self.wait(1)
+
+        # Animate first color highlights
+        first_red_indices = [0, 3, 5]
+        self.play(*[gn1[i].animate.set_color(RED) for i in first_red_indices])
+        self.wait(1.5)
+
+        # Define second numbers (for transformation)
+        second_numbers = [0, 0, 1, 0, 1, 0, 1, 0]
+        gn2 = VGroup(*[
+            MathTex(str(num)).next_to(olbl[i], UP)
+            for i, num in enumerate(second_numbers)
+        ])
+
+        gn2[2].color = RED
+        gn2[4].color = RED
+        gn2[6].color = RED
+
+        self.play(Transform(gn1, gn2))
+        self.wait(2)
+
+        # Define third numbers
+        third_numbers = [0, 1, 0, 1, 0, 0, 0, 1]
+        gn3 = VGroup(*[
+            MathTex(str(num)).next_to(olbl[i], UP)
+            for i, num in enumerate(third_numbers)
+        ])
+
+        gn3[1].color = RED
+        gn3[3].color = RED
+        gn3[7].color = RED
+        self.play(Transform(gn1, gn3))
+        self.wait(3)
+
+        num2_lines = 5  # how many lines
+        line2_length = 1
+        line2_y = 0.4  # vertical position
+        line2_spacing = 1.3  # horizontal spacing between lines
+
+        dlb = VGroup(*[
+            Line(LEFT * line2_length / 2, RIGHT * line2_length / 2)
+                      .shift(RIGHT * (i - (num2_lines - 1) / 2) * line2_spacing + UP * line2_y)
+            for i in range(num2_lines)
+        ])
+
+        o_labels = [MathTex("0").next_to(dlb[i], UP) for i in range(num2_lines)]
+
+        fancyblock = VGroup(gn1, olbl, S1)
+
+        oblock = VGroup(dlb, *o_labels)
+
+        self.play(Transform(fancyblock, oblock))
+
+        self.wait(2)
+
+        self.play(FadeIn(oblock))
+        self.remove(fancyblock)
+
+        ll2 = dlb[0].copy().shift(LEFT * line2_spacing)
+        ll1 = dlb[0].copy().shift(RIGHT * line2_spacing)
+        go1 = VGroup(dlb[1], o_labels[1])
+        go2 = VGroup(dlb[2], o_labels[2])
+        go3 = VGroup(dlb[3], o_labels[3])
+        go4 = VGroup(dlb[4], o_labels[4])
+
+        self.play(go1.animate.shift(RIGHT * (line2_length + 0.3)),
+                  go2.animate.shift(RIGHT * (line2_length + 0.3)),
+        go3.animate.shift(RIGHT * (line2_length + 0.3)),
+        go4.animate.shift(RIGHT * (line2_length + 0.3)))
+
+        self.wait(0.2)
+        self.play(FadeIn(ll2.set_color(RED)),FadeIn(ll1.set_color(RED)))
+        self.wait(1)
+
+        num3_lines = 7  # how many lines
+        line3_length = 1
+        line3_y = 0.4  # vertical position
+        line3_spacing = 1.3  # horizontal spacing between lines
+
+        gp5 = VGroup(*[
+            Line(LEFT * line3_length / 2, RIGHT * line3_length / 2)
+                     .shift(RIGHT * (k - (num3_lines - 1) / 2) * line3_spacing + UP * line3_y)
+            for k in range(num3_lines)
+        ])
+
+        gp5[0].set_color(RED)
+        gp5[2].set_color(RED)
+
+        die3labels = VGroup(MathTex("0").next_to(gp5[1], UP), MathTex("0").next_to(gp5[3], UP),
+                            MathTex("0").next_to(gp5[4], UP),
+                            MathTex("0").next_to(gp5[5], UP), MathTex("0").next_to(gp5[6], UP))
+
+        die3group = VGroup(gp5, die3labels)
+
+        gp3 = VGroup(*[
+            Line(LEFT * line3_length / 2, RIGHT * line3_length / 2)
+                     .shift(RIGHT * (i - (num3_lines - 1) / 2) * line3_spacing + UP * line3_y)
+            for i in range(num3_lines)
+        ])
+
+        gp3[1].set_color(RED)
+        gp3[3].set_color(RED)
+
+        dielabels = VGroup(MathTex("0").next_to(gp3[0], UP), MathTex("0").next_to(gp3[2], UP), MathTex("0").next_to(gp3[4], UP),
+                           MathTex("0").next_to(gp3[5], UP), MathTex("0").next_to(gp3[6], UP))
+
+        diegroup = VGroup(gp3, dielabels)
+
+        gp4 = VGroup(*[
+            Line(LEFT * line3_length / 2, RIGHT * line3_length / 2)
+                     .shift(RIGHT * (j - (num3_lines - 1) / 2) * line3_spacing + UP * line3_y)
+            for j in range(num3_lines)
+        ])
+
+        gp4[2].set_color(RED)
+        gp4[4].set_color(RED)
+
+        die2labels = VGroup(MathTex("0").next_to(gp4[0], UP), MathTex("0").next_to(gp4[1], UP),
+                           MathTex("0").next_to(gp4[3], UP),
+                           MathTex("0").next_to(gp4[5], UP), MathTex("0").next_to(gp4[6], UP))
+
+        die2group = VGroup(gp4, die2labels)
+
+        numz_lines = 11  # how many lines
+        linez_length = 1
+        linez_y = 0.4  # vertical position
+        linez_spacing = 1.3  # horizontal spacing between lines
+
+        zkg = VGroup(*[
+            Line(LEFT * linez_length / 2, RIGHT * linez_length / 2)
+                     .shift(RIGHT * (j - (numz_lines - 1) / 2) * linez_spacing + UP * linez_y)
+            for j in range(numz_lines)
+        ])
+
+        zkg[0].set_color(RED)
+        zkg[2].set_color(RED)
+        zkg[4].set_color(RED)
+        zkg[6].set_color(RED)
+        zkg[8].set_color(RED)
+        zkg[10].set_color(RED)
+
+        zkglbl = VGroup(MathTex("0").next_to(zkg[1], UP), MathTex("0").next_to(zkg[3], UP),
+                            MathTex("0").next_to(zkg[5], UP),
+                            MathTex("0").next_to(zkg[7], UP), MathTex("0").next_to(zkg[9], UP))
+
+        zgpg = VGroup(zkglbl, zkg).scale(0.9)
+
+        self.clear()
+        self.play(FadeIn(die3group))
+        self.wait(2)
+        self.play(Transform(die3group, diegroup))
+        self.wait(1)
+        self.play(Transform(die3group, die2group))
+        self.wait(1)
+        self.play(Transform(die3group,zgpg))
+        self.wait(1)
+
+        slots_text = MathTex(r"6 \text{ available slots}", font_size=30, color=BLUE).to_edge(DOWN, buff=1.0)
+        self.play(FadeIn(slots_text))
+        self.wait(0.5)
+        formula = MathTex(r"\binom{6}{3} = 20", font_size=40, color=WHITE)
+        formula.next_to(slots_text, UP, buff=0.5)
+        self.play(Write(formula))
+        self.wait(1)
+        self.clear()
+
+
+
+
+
+
+class DkpLemmasScene(Scene):
+        def construct(self):
+                # Scene 4: First Lemma
+                derivation = MathTex(
+                        r"\text{For a pair } (N, \;p): \;\;\quad\quad\quad\quad\quad\quad\quad\quad\quad \\\\",r" \Rightarrow \; (N - p) \text{  Zeroes} \quad \quad",
+                        r"\Rightarrow \; (N - p + 1) \text{  Valid positions for Ones},",
+                        font_size=36,
+                        color=WHITE
+                )
+
+                derivation.to_edge(UP).shift(1.5*DOWN)
+                self.play(Write(derivation))
+                self.wait(0.5)
+                lemma = MathTex(r"\text{Kaplansky's First Lemma: For a pair }(N,\;p), \;|Z_p|= \binom{N-p+1}{p}", font_size=40, color=YELLOW_C)
+                lemma.next_to(derivation, DOWN, buff=1.0)
+                self.play(Write(lemma))
+                self.wait(1)
+                self.clear()
+
+                custom_labels = ["2", "3", "4", "5", "6", "7", "8", "1"]
+
+                n = len(custom_labels)
+                radius = 2.5
+                circle = Circle(radius=radius, color=GRAY)
+
+                # Step 1: Generate points CCW
+                indexed_points = []
+                for i in range(n):
+                        angle = TAU * i / n
+                        pos = np.array([radius * np.cos(angle), radius * np.sin(angle), 0])
+                        indexed_points.append((i, angle, pos))
+
+                # Step 2: Sort CLOCKWISE
+                def clockwise_angle(p):
+                        x, y = p[2][0], p[2][1]
+                        return -np.arctan2(y, x)
+
+                indexed_points.sort(key=clockwise_angle)
+
+                # Step 3: Find top-left
+                top_left = min(indexed_points, key=lambda p: (-p[2][1], p[2][0]))
+
+                # Step 4: Rotate so top-left is first
+                start_idx = indexed_points.index(top_left)
+                rotated_points = indexed_points[start_idx:] + indexed_points[:start_idx]
+
+                # Step 5: Create dots & labels
+                dots = []
+                labels = []
+                for i, (_, _, pos) in enumerate(rotated_points):
+                        pt = Dot(point=pos, color=WHITE).set_z_index(2)
+                        direction = pos / np.linalg.norm(pos)
+                        label = Tex(custom_labels[i], color=WHITE).scale(0.6)
+                        label.move_to(pos + 0.4 * direction)
+                        dots.append(pt)
+                        labels.append(label)
+
+                # Step 6: Animate
+                self.play(Create(circle))
+                order = [7, 0, 1, 2, 3, 4, 5, 6]  # order of reveal
+                for idx in order:
+                        self.play(FadeIn(dots[idx]), FadeIn(labels[idx]), run_time=0.5)
+                self.wait(2)
+
+                # ==== Second set ====
+                custom_labels2 = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "...", "N-2", "N-1", "N", "1"]
+
+                n2 = len(custom_labels2)
+                circle2 = Circle(radius=radius, color=GRAY)
+                indexed_points2 = []
+                for i in range(n2):
+                        angle2 = TAU * i / n2
+                        pos2 = np.array([radius * np.cos(angle2), radius * np.sin(angle2), 0])
+                        indexed_points2.append((i, angle2, pos2))
+
+                indexed_points2.sort(key=clockwise_angle)
+                top_left2 = min(indexed_points2, key=lambda p: (-p[2][1], p[2][0]))
+                start_idx2 = indexed_points2.index(top_left2)
+                rotated_points2 = indexed_points2[start_idx2:] + indexed_points2[:start_idx2]
+
+                dots2 = []
+                labels2 = []
+                for i, (_, _, pos2) in enumerate(rotated_points2):
+                        pt2 = Dot(point=pos2, color=WHITE).set_z_index(2)
+                        direction2 = pos2 / np.linalg.norm(pos2)
+                        label2 = Tex(custom_labels2[i], color=WHITE).scale(0.6)
+                        label2.move_to(pos2 + 0.4 * direction2)
+                        dots2.append(pt2)
+                        labels2.append(label2)
+
+                # Groups for morphing
+                group1 = VGroup(circle, *dots, *labels)
+                group2 = VGroup(circle2, *dots2, *labels2)
+
+                # Highlight first and last
+                self.play(dots[0].animate.set_color(RED), dots[-2].animate.set_color(RED))
+                self.wait(2)
+
+                # Morph
+                self.play(TransformMatchingShapes(group1, group2))
+                self.wait(2)
+
+                # Highlight new first and last
+                self.play(dots2[0].animate.set_color(RED), dots2[-2].animate.set_color(RED))
+                self.wait(2)
+
+                explanation = MathTex(r"\text{If 1 is chosen, then 2 and }N\text{ are excluded}", font_size=40).shift(UP * 0.5)
+                explanation.to_edge(DOWN)
+                self.play(group2.animate.shift(UP * 0.5))
+                self.wait(0.5)
+                self.play(Write(explanation))
+                self.wait(2)
+                result = MathTex(r"\binom{N-p-1}{p-1}", font_size=36, color=YELLOW_C)
+                result.next_to(explanation, DOWN, buff=0.5)
+                self.play(Write(result))
+                self.wait(1)
+                self.clear()
+
+                # Scene 7: Cyclic Excluding 1
+                formula = MathTex(r"\text{Excluding the first element of N}", font_size=42, color=WHITE).shift(UP * 2)
+                self.play(Write(formula))
+                self.wait(1)
+                exc1 = MathTex(r"N \xrightarrow{-n_1} N_o \quad ; \quad |N_o|=N-1", font_size=38, color=WHITE).next_to(formula, DOWN, buff=0.8)
+                exc3 = MathTex(r"\text{First Lemma}\; (N-1,\;p)", font_size=42).next_to(exc1, DOWN, buff=0.4)
+                exc2 = MathTex(r"S_p \, \subseteq \, N_o",r"\quad \quad |S_p| \; = \; \binom{(N-1)-p+1}{p}", font_size=38).next_to(exc3, DOWN, buff=0.5)
+                exc21 = MathTex(r"S_p \, \subseteq \, N_o", r"\quad \quad |S_p| \; = \; ",r"\binom{N-p}{p}",
+                               font_size=38).next_to(exc3, DOWN, buff=0.5)
+
+                self.play(Write(exc1))
+                self.wait(1)
+                self.play(formula.animate.shift(UP * 0.5), exc1.animate.shift(UP * 0.5))
+                self.wait(1)
+                self.play(Write(exc3))
+                self.wait(0.5)
+                self.play(Write(exc2))
+                self.wait(1)
+                self.play(TransformMatchingTex(exc2, exc21))
+                self.wait(2)
+                self.clear()
+
+                #yes1 case
+
+                noctc = MathTex(r"\text{Including the first element of N}", font_size=42, color=WHITE).shift(UP * 2)
+                self.play(Write(noctc))
+                self.wait(1)
+                exc01 = MathTex(r"N \xrightarrow{-n_N \; -n_2} N_f \quad ; \quad |N_f|=N-2", font_size=38,
+                               color=WHITE).next_to(noctc, DOWN, buff=0.8)
+                exc03 = MathTex(r"\text{First Lemma}\; (N-3,\;k) \;|\; k = p-1", font_size=42).next_to(exc01, DOWN, buff=0.4)
+                exc02 = MathTex(r"S_k \, \subseteq \, N_f", r"\quad \quad |S_k| \; = \; \binom{(N-3)-(p-1)+1}{p-1}",
+                               font_size=38).next_to(exc3, DOWN, buff=0.5)
+                exc021 = MathTex(r"S_k \, \subseteq \, N_f", r"\quad \quad |S_p| \; = \; ", r"\binom{N-p-1}{p-1}",
+                                font_size=38).next_to(exc3, DOWN, buff=0.5)
+
+                self.play(Write(exc01))
+                self.wait(1)
+                self.play(noctc.animate.shift(UP * 0.5), exc01.animate.shift(UP * 0.5))
+                self.wait(1)
+                self.play(Write(exc03))
+                self.wait(0.5)
+                self.play(Write(exc02))
+                self.wait(1)
+                self.play(TransformMatchingTex(exc02, exc021))
+                self.wait(2)
+                self.clear()
+
+                # Scene 8: Second Lemma
+
+                expr1 = MathTex(r"|S_p| = |S_o| + |S_k|",r"|S_p| \;=\; \binom{N-p-1}{p-1} + \binom{N-p}{p}", font_size=44, color=WHITE)
+                expr1[1].next_to(ORIGIN, DOWN, buff=0.25)
+                expr1[0].next_to(ORIGIN, UP, buff=0.25)
+                expr2 = MathTex(r"|S_p| \;=\; \frac{N}{N-p} \binom{N-p}{p}", font_size=44, color=YELLOW_C)
+                self.play(Write(expr1[0]))
+                self.wait(1.5)
+                self.play(expr1[0].animate.shift(UP * 0.5),Write(expr1[1]))
+                self.wait(1)
+                self.play(Transform(expr1, expr2))
+                caption = MathTex(r"\text{Kaplansky's Second Lemma}", font_size=30, color=YELLOW_C)
+                caption.next_to(expr2, DOWN, buff=0.5)
+                self.wait(1)
+                self.play(Write(caption))
+                self.wait(1)
+                self.clear()
+
+                # Scene 9: Diophantine Interpretation
+
+                # Diagram
+
+                N = 8
+                p = 3
+                circles = VGroup(*[Dot() for _ in range(N)]).shift(DOWN * 2)
+                circles.arrange(RIGHT, buff=1)
+                labels = VGroup(*[MathTex(str(i + 1), font_size=35) for i in range(N)])
+                for i in range(N):
+                        labels[i].scale(0.8).next_to(circles[i], DOWN, buff=0.3)
+
+                dotgroup = VGroup(circles, labels)
+
+                # Equally spaced horizontal lines above the dots
+                line_spacing = 0.3  # vertical space between lines
+                base_height = 1.0  # how far above the dots the lowest line starts
+
+                num_lines = 8  # how many lines you want
+                line_length = 0.9
+                line_y = 0.4  # vertical position above dots
+                line_spacing = 1.1  # horizontal spacing between lines
+
+                olbl = VGroup(*[
+                        Line(LEFT * line_length / 2, RIGHT * line_length / 2)
+                              .shift(RIGHT * (i - (num_lines - 1) / 2) * line_spacing + UP * line_y)
+                        for i in range(num_lines)
+                ])
+
+                self.play(FadeIn(dotgroup))
+                self.wait(2)
+                self.play(FadeIn(olbl))
+                self.wait(2)
+
+                # Define initial numbers (either 0 or 1)
+                initial_numbers = [1, 0, 0, 1, 0, 1, 0, 0]
+                gn1 = VGroup(*[
+                        MathTex(str(num)).next_to(olbl[i], UP)
+                        for i, num in enumerate(initial_numbers)
+                ])
+
+                # Show initial numbers
+                self.play(Write(gn1))
+                self.wait(1)
+
+                # Animate first color highlights
+                first_red_indices = [0, 3, 5]
+                self.play(*[gn1[i].animate.set_color(RED) for i in first_red_indices])
+                self.wait(1.5)
+
+                # Define second numbers (for transformation)
+                second_numbers = [0, 0, 1, 0, 1, 0, 1, 0]
+                gn2 = VGroup(*[
+                        MathTex(str(num)).next_to(olbl[i], UP)
+                        for i, num in enumerate(second_numbers)
+                ])
+
+                gn2[2].color = RED
+                gn2[4].color = RED
+                gn2[6].color = RED
+
+                self.play(Transform(gn1, gn2))
+                self.wait(2)
+
+                # Define third numbers
+                third_numbers = [0, 1, 0, 1, 0, 0, 0, 1]
+                gn3 = VGroup(*[
+                        MathTex(str(num)).next_to(olbl[i], UP)
+                        for i, num in enumerate(third_numbers)
+                ])
+
+                gn3[1].color = RED
+                gn3[3].color = RED
+                gn3[7].color = RED
+                self.play(Transform(gn1, gn3))
+                self.wait(3)
+                self.play(FadeOut(gn1),FadeOut(dotgroup),FadeOut(olbl))
+                self.clear()
+
+                #
+
+                eq = MathTex(r"x_1 \;+ x_2 \;+ x_3 \;+ \cdots \;+ x_p \;+ x_{p+1} = N - p, \quad x_p \ge 0", font_size=41, color=WHITE).shift(UP * 1.2)
+                eq2 = MathTex(r"(x^{\prime}_1 - 1) \;+ x_2 \;+ x_3 \;+ \cdots \;+ x_i \;+ (x^{\prime}_{i+1} - 1) = N - p, \quad x_i > 0", font_size=41, color=WHITE).next_to(eq, DOWN, buff=0.8)
+                eq3 = MathTex(r"x^{\prime}_1 \;+ x_2 \;+ x_3 \;+ \cdots \;+ x_i \;+ x^{\prime}_{i+1} = N - p + 2, \quad x_i > 0",
+                              font_size=41, color=WHITE).next_to(eq, DOWN, buff=0.8)
+                solution = MathTex(r"\binom{(N-i+2)-1}{(i+1)-1} = \binom{N-i+1}{i}", font_size=41, color=YELLOW_C)
+                solution.next_to(eq2, DOWN, buff=0.8)
+                self.play(Write(eq))
+                self.wait(0.5)
+                self.play(Write(eq2))
+                self.wait(1)
+                self.play(Transform(eq2,eq3), run_time=1)
+                self.wait(2)
+                self.play(Write(solution))
+                self.wait(1)
+                self.clear()
