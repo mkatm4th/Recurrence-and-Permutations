@@ -1,0 +1,152 @@
+from manim import *
+
+class DerangementPIE(Scene):
+    def construct(self):
+        # Intro transition with title
+        self.wait(0.5)
+        title = Text("Derangements via Inclusion-Exclusion", font_size=60).scale(0.8)
+        self.play(FadeIn(title, shift=UP))
+        self.wait(1.5)
+        self.play(FadeOut(title, shift=DOWN))
+
+        # Define S and objective
+        s_def = MathTex(r"S = \{1, 2, \dots, n\}").scale(1.2)
+        self.play(Write(s_def))
+        self.wait(1)
+
+        perm_goal = MathTex(r"\sigma: S \to S, \quad \sigma(i) \ne i \text{ for all } i").next_to(s_def, DOWN, buff=0.1)
+        self.play(s_def.animate.shift(UP * 1))
+        self.play(Write(perm_goal))
+        self.wait(1.5)
+
+        derange_label = MathTex(r"D_n = \text{number of such permutations}").next_to(perm_goal, DOWN, buff=0.8)
+        self.play(FadeIn(derange_label, shift=UP))
+        self.wait(2)
+        self.play(FadeOut(s_def, perm_goal, derange_label))
+
+        # 1
+
+        ai_def = MathTex(
+            r"\text{Let } A_i \subseteq S_n \text{ be the set of permutations that fix element } i:"
+        ).scale(1).shift(UP * 0.5)
+
+        ai_def1 = MathTex(
+            r"A_i = \{\sigma \in S_n \mid \sigma(i) = i\}",
+        ).scale(1).next_to(ai_def, DOWN, buff=0.5)
+
+        ai_def2 = MathTex(
+        r"\text{Then } A_1 \cup A_2 \cup \cdots \cup A_n \text{ is the set fixing at least one element.}"
+    ).scale(1).next_to(ai_def1, DOWN, buff=0.8)
+
+        self.play(FadeIn(ai_def),run_time=1)
+        self.wait(1)
+        self.play(Write(ai_def1))
+        self.wait(2)
+        self.play(Write(ai_def2))
+        self.wait(2)
+        self.play(FadeOut(ai_def),FadeOut(ai_def2),FadeOut(ai_def1))
+        self.wait(1)
+
+        # PIE Setup
+        union_eq = MathTex(r"D_n = n! - ","|A_1 \cup A_2 \cup \cdots \cup A_n|").scale(1.2)
+        self.play(Write(union_eq))
+        self.wait(3)
+        self.play(FadeOut(union_eq))
+
+        # PIE formula application
+
+        pie_formula = MathTex(
+            r"|A_1 \cup \cdots \cup A_n| = ",
+            r"\sum_{k=1}^{n} (-1)^{k+1} ",
+            r"\sum_{1 \le i_1 < \cdots < i_k \le n} |A_{i_1} \cap \cdots \cap A_{i_k}|"
+        ).scale(0.9)
+
+        bp = MathTex(r"\text{By Inclusion-Exclusion:}").next_to(pie_formula, UP, buff=1.5)
+
+        self.play(FadeIn(bp))
+        self.wait(1)
+        self.play(Write(pie_formula))
+        self.wait(1)
+
+        # Intersection simplification
+        inter_eq = MathTex(r"|A_{i_1} \cap \cdots \cap A_{i_k}|").scale(1.2)
+        txt = MathTex(r"\text{Set of permutations that fix all}\; \{i_1,i_2,\dots,i_k\}").next_to(inter_eq, DOWN, buff=0.1)
+        self.play(FadeOut(pie_formula[0]),FadeOut(pie_formula[1]), FadeOut(bp))
+        self.wait(0.5)
+        self.play(Transform(pie_formula[2], inter_eq))
+        self.wait(1)
+        self.play(pie_formula[2].animate.shift(UP * 0.5))
+        self.wait(0.5)
+        self.play(FadeIn(txt))
+        self.wait(2)
+        self.play(pie_formula[2].animate.shift(LEFT * 1.3))
+
+        eql = MathTex("=\;(n-k)!").next_to(inter_eq, RIGHT).shift(UP * 0.5 + LEFT * 1).scale(1.1)
+        self.wait(0.5)
+        self.play(FadeIn(eql))
+        self.wait(3)
+
+        # Blackout
+        sq = Rectangle(height=3, width=10, color=BLACK, fill_opacity=1)
+        self.play(FadeIn(sq))
+        self.wait(1)
+
+        lbl2 = MathTex(r"\left| A_1 \cup \cdots \cup A_n \right| = \sum_{k=1}^{n} (-1)^{k+1}",r" \binom{n}{k} (n - k)!").shift(DOWN * 0.4).scale(1.2)
+        lbl1 = MathTex(
+            r"\binom{n}{k}\; \text{choices for fixing k distinct positions given a set with n elements}").scale(0.8).next_to(lbl2, UP, buff=0.6)
+        self.play(FadeIn(lbl1))
+        self.wait(2.5)
+        self.play(Write(lbl2))
+        self.wait(3)
+        self.play(FadeOut(lbl2[0]),FadeOut(lbl1))
+        self.wait(1)
+
+        # Combine intersection count with binomial
+        binom_eq = MathTex(r"\binom{n}{k}(n-k)!",r" = \frac{n!}{k!}").scale(1.2)
+        self.play(Transform(lbl2[1], binom_eq[0]))
+        self.wait(1)
+        self.play(FadeIn(binom_eq[1]))
+        self.wait(1.5)
+        mobgroup = VGroup(lbl2[1],binom_eq[1])
+        self.play(mobgroup.animate.shift(UP * 1))
+        self.wait(1)
+
+        simp_union = MathTex(r"|A_1 \cup \cdots \cup A_n| = \sum_{k=1}^{n} (-1)^{k+1} \cdot \frac{n!}{k!}").next_to(binom_eq, DOWN, buff=0.1)
+        self.play(Write(simp_union))
+        self.wait(2)
+
+        # Blackout
+        sq3 = Rectangle(height=6, width=10, color=BLACK, fill_opacity=1)
+        self.play(FadeIn(sq3))
+        self.wait(1)
+
+        #REmember
+
+        self.play(Write(union_eq))
+        self.wait(2)
+        txt2 = MathTex(r"\sum_{k=1}^{n} (-1)^{k+1} \cdot \frac{n!}{k!}").shift(RIGHT * 1.2)
+        self.play(union_eq[0].animate.shift(RIGHT * 0.5),Transform(union_eq[1], txt2))
+        self.wait(2)
+
+        #BLACKOUT
+        sq2 = Rectangle(height=3, width=10, color=BLACK, fill_opacity=1)
+        self.play(FadeIn(sq2))
+        self.wait(0.5)
+
+        # Final Derangement formula and simplification
+        final_eq = MathTex(r"D_n = n! \left(1 - \sum_{k=1}^{n} \frac{(-1)^{k+1}}{k!}\right)").scale(1.1)
+        self.play(Write(final_eq))
+        self.wait(2)
+        self.play(final_eq.animate.shift(UP * 1))
+        self.wait(1)
+
+        boxed_result = MathTex(r"{D_n = n! \sum_{k=0}^{n} \frac{(-1)^k}{k!}}").set_color(YELLOW).next_to(final_eq, DOWN, buff=0.8).scale(1.1)
+        self.play(FadeIn(boxed_result))
+        self.wait(2.5)
+
+        # Approximation
+        self.play(FadeOut(final_eq))
+        approx = MathTex(r"D_n = n!\,(1\,-\,\frac{1}{2!}\,+\,\frac{1}{3!}\,-\,\frac{1}{4!}\,+\,\frac{1}{5!}\,-\,\dots\,+\,\frac{1}{n!})", color=YELLOW).scale(1.2)
+        self.play(Transform(boxed_result, approx))
+        self.wait(3)
+        self.play(FadeOut(boxed_result))
