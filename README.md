@@ -5,6 +5,8 @@ In the end, however, the class didn’t quite work out, so I had to shelve all t
 Honestly, at the time it felt pretty disappointing—besides being the first time I’d picked up Python in a long while, it was also my first experience using Manim,
 so I had invested a lot of time and effort into learning the library and producing the animations.
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 At first, though I already had some thoughts about submitting an entry to SoME 2025, I never planned to use this previous work for it. Later, however, I figured since I already had something half-finished
 (which, as I’d sadly come to realize later, wasn’t even 1/20 done), I might as well build upon it.
 Using some of the notes I’d written for that class, along with a few problem sets I’d devised, I selected a few interesting topics in combinatorics I had worked with before
