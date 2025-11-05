@@ -1,5 +1,116 @@
 from manim import *
 
+class InclusaoExclusao3Sets(Scene):
+    def construct(self):
+        # Círculos A, B e C
+        A = Circle(radius=1.5, color=BLUE).shift(LEFT + UP)
+        B = Circle(radius=1.5, color=GREEN).shift(RIGHT + UP)
+        C = Circle(radius=1.5, color=RED).shift(DOWN)
+
+        labelA = Text("A", color=BLUE).next_to(A, LEFT)
+        labelB = Text("B", color=GREEN).next_to(B, RIGHT)
+        labelC = Text("C", color=RED).next_to(C, DOWN)
+
+        self.play(Create(A), Create(B), Create(C))
+        self.play(Write(labelA), Write(labelB), Write(labelC))
+
+        # Regiões básicas
+        region_A = A.copy()
+        region_B = B.copy()
+        region_C = C.copy()
+
+        # Interseções 2 a 2
+        AB = Intersection(A, B).set_fill(BLUE, opacity=0.5).set_z_index(1)
+        AC = Intersection(A, C).set_fill(RED, opacity=0.5).set_z_index(1)
+        BC = Intersection(B, C).set_fill(GREEN, opacity=0.5).set_z_index(1)
+        oab = Intersection(A, B).set_z_index(5)
+        oac = Intersection(A, C).set_z_index(5)
+        obc = Intersection(B, C).set_z_index(5)
+        # Interseção tripla
+        ABC = Intersection(A, B, C).set_fill(GOLD, opacity=0.5)
+
+        # Pintar cada região (como mobject separado)
+        self.play(region_A.animate.set_fill(BLUE, opacity=0.3))
+        self.play(region_B.animate.set_fill(GREEN, opacity=0.3))
+        self.play(region_C.animate.set_fill(RED, opacity=0.3))
+        self.play(FadeIn(AB), FadeIn(oab))
+        self.play(FadeIn(BC),FadeIn(obc))
+        self.play(FadeIn(AC),FadeIn(oac))
+        self.play(FadeIn(ABC))
+        #self.play(Create(oab), Create(oac), Create(obc))
+
+        self.wait(4)
+
+        #Taking Apart
+
+        ab2 = Intersection(A, B).set_fill(BLUE, opacity=0.8).next_to(AB, RIGHT, buff=3.5)
+        abc3 = Intersection(A,B,C).set_fill(BLACK, opacity=2/5).set_z_index(3)
+        ab1 = Difference(AB,ABC).set_fill(GREEN, opacity=0.5)
+        self.play(Transform(AB, ab2), FadeIn(ab1),FadeIn(abc3))
+        dtr= Dot().next_to(ab2, UP).shift(LEFT)
+        labelAB = MathTex("|A \\cap B|", color=BLUE).next_to(dtr, RIGHT,buff=-0.1).scale(0.8)
+        self.play(FadeIn(labelAB))
+        self.wait(2)
+
+        bc2 = Intersection(A, B).set_fill(GREEN, opacity=0.8).next_to(ab2, RIGHT)
+        abc2 = Intersection(A,B,C).set_fill(BLACK, opacity=2/5).set_z_index(3)
+        bc1 = Difference(BC,ABC).set_fill(RED, opacity=0.5)
+        self.play(Transform(BC, bc2), FadeIn(bc1),FadeIn(abc2))
+        dtl = Dot().next_to(bc2, UP).shift(RIGHT)
+        labelBC = MathTex("|B \\cap C|", color=GREEN).next_to(dtl, LEFT,buff=-0.1).scale(0.8)
+        self.play(FadeIn(labelBC))
+        self.wait(2)
+
+        dot = Dot(color=WHITE).scale(1).next_to(ab2, DOWN,buff=1)
+
+        ac2 = Intersection(A, B).set_fill(RED, opacity=0.8).next_to(dot, RIGHT,buff=0.05)
+        abc1 = Intersection(A,B,C).set_fill(BLACK, opacity=1).set_z_index(3)
+        ac1 = Difference(AC,ABC).set_fill(BLUE, opacity=0.5)
+        self.play(Transform(AC, ac2), FadeIn(ac1),FadeIn(abc1))
+        labelAC = MathTex("|A \\cap C|", color=RED).next_to(ac2, DOWN).scale(0.8)
+        self.play(FadeIn(labelAC))
+        self.wait(2)
+
+        rAbc= Intersection(A,B,C).set_fill(YELLOW, opacity=0.5).set_z_index(5)
+        self.play(FadeOut(abc2),FadeOut(abc1),FadeOut(abc3),FadeIn(rAbc))
+        self.play(ScaleInPlace(rAbc, 1.2), run_time=0.3)
+        self.play(ScaleInPlace(rAbc, 1 / 1.2), run_time=0.3)
+        self.wait(2)
+
+        # Fórmula
+        formula = MathTex(
+            "|A \\cup B \\cup C| =",
+            "|A| + |B| + |C|",
+            "- |A \\cap B| - |A \\cap C| - |B \\cap C|",
+            "+ |A \\cap B \\cap C|",
+            color=YELLOW
+        ).scale(0.8).next_to(labelC, DOWN)
+        #self.play(Write(formula))
+        self.wait(2)
+
+        #F2
+
+        dot1 = Dot().scale(0.1).next_to(labelA, UP,buff=0.5)
+        cba= Intersection(A,B,C).set_fill(YELLOW, opacity=1).set_z_index(6)
+
+        ff = MathTex(
+                     r"|A\cupB\cupC| = |A| + |B| + |C|"
+            ,font_size= 32, color=YELLOW,
+            tex_to_color_map={"A": RED,"B": GREEN,"C": BLUE}).align_to(labelA, RIGHT).shift(DOWN).shift(RIGHT * 0.4)
+
+        ff2 = MathTex(
+            r" -|A \cap B| - |A \cap C| - |B \cap C|",
+            font_size=32, color=YELLOW,
+            tex_to_color_map={"A": RED, "B": GREEN, "C": BLUE}).next_to(ff,DOWN,buff=0.2)
+
+        ff3 = MathTex(r" +|A \cap B \cap C|", font_size=32, color=YELLOW,
+            tex_to_color_map={"A": RED, "B": GREEN, "C": BLUE}).next_to(ff2,DOWN,buff=0.2)
+
+        ffgg = VGroup(ff, ff2, ff3)
+
+        self.play(Write(ffgg))
+        self.wait(2)
+
 class DerangementPIE(Scene):
     def construct(self):
         # Intro transition with title
