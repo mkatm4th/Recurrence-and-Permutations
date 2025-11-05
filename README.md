@@ -28,7 +28,8 @@ For curiosity’s sake, the original version was nearly 50 minutes of animations
 
 Overall, even if it didn’t turn out all bad, I don’t think it reflects my best work. Because of time constraints,
 I had to set aside a lot of my usual scrutiny and make compromises I really didn’t want to—sometimes drifting from the original intent of making an engaging experience behind the project.
-Unfortunately, the limited post-production time really affected the final video quality. But, not all in the negative, it also taught me a valuable lesson for future projects.
+The limited post-production time really affected the final video quality, but at least I can say it taught me a lesson I'll take for future projects. 
+Not all in the negative, though, as I previously said, the basework here is still pretty alright. I'd still advise taking a look at the unused animations—I've made them to be pretty self-explanatory.
 Anyway, if you’re reading this—thank you for checking out my video! I hope that, despite its flaws, you still ended up learning something new.
 
 — Sincerely,
